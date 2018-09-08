@@ -1,0 +1,58 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"networkinterface\"><param name=\"android-package\" value=\"com.albahra.plugin.networkinterface.networkinterface\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"OSC\"><param name=\"android-package\" value=\"fr.ircam.efficace.cordova.osc.OSCUtils\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"File\"><param name=\"android-package\" value=\"org.apache.cordova.file.FileUtils\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "com.albahra.plugin.networkinterface": {
+            "PACKAGE_NAME": "fr.ircam.repmus.efficace.traj"
+        },
+        "fr.ircam.efficace.cordova.osc": {
+            "PACKAGE_NAME": "fr.ircam.repmus.efficace.traj"
+        },
+        "org.apache.cordova.file": {
+            "PACKAGE_NAME": "fr.ircam.repmus.efficace.traj"
+        }
+    },
+    "dependent_plugins": {}
+}

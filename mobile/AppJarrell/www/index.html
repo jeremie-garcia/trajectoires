@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<string name="app_name">Skecth1</string>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />   
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"/>
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    
+
+    
+
+    <title>AppJarrell</title>
+</head>
+
+<body onload="startup();">
+            
+    <!-- Start of first page -->
+    <div id="foo" data-role="page" >
+
+        <div data-role="header" class="ui-bar-a ui-header" role="banner">
+            <h1 class="ui-title" tabindex="0" role="heading" aria-level="1">Curves </h1>
+        </div><!-- /header -->
+
+        <div data-role="content" class="canvCont" role="main"> 
+            <canvas id="canvas" class="drawing-canvas" width="600px" height="400px" ></canvas>  <!-- 1190 650-->
+           <!-- <canvas id="canvasAxis" class="drawing-canvas" width="1200px" height="640px" style="position: absolute; z-index:0;" > </canvas>-->
+        </div>    
+
+        
+        <div class="right">
+            
+            <FONT COLOR="white" size="2"> Distance 
+                                            Speaker</FONT>
+            <div data-role="fieldcontain" >
+                <input type="text" id="distHP" name="distHP" value="0.5" onchange="javascript:plotCanvas.plotAxis();" />
+            </div>
+            
+            <div  class="div_r">
+                <div data-role="controlgroup" data-type="vertical" >
+                    <a onClick="javascript:sendOscPlay();" data-role="button" data-iconpos="bottom" data-icon="play" data-theme="a" data-inline="true"> <small>Play</small></a>
+                    <a onClick="javascript:sendOscRecord();" data-role="button" data-iconpos="bottom" data-icon="plus" data-theme="a" data-inline="true"><small> Rec</small> </a>
+                </div>           
+            </div>
+                
+            <div  class="div_r">
+                <FONT COLOR="white" size="2"> Curves in 
+                                            background</FONT>
+                <div data-role="fieldcontain" >
+                    <input type="checkbox" id="background" style="height: 25px; width: 25px;"> 
+                </div>
+            </div>
+            
+            <div  class="div_r">
+                <FONT COLOR="white" size="2"> Continue
+                                                Curve </FONT>
+                <div data-role="fieldcontain" >
+                    <input type="checkbox" id="continueCurve" style="height: 25px; width: 25px;"> 
+                </div>
+            </div>            
+             
+            
+        </div>
+        
+        <div data-role="footer">
+            <div class ="divFoot_l">
+                <div data-role="controlgroup" data-type="horizontal" >
+                    <a href="#bar" data-role="button" data-iconpos="right" data-icon="gear" >OSC Settings</a>
+                    <a href="#" onClick="javascript:plotCanvas.zoom(1.2);" data-role="button" data-iconpos="right" data-icon="search" >Zoom In</a>
+                    <a href="#" onClick="javascript:plotCanvas.zoom(0.8);" data-role="button" data-iconpos="right" data-icon="search" >Zoom Out</a>
+                </div>
+            </div>
+            <div class ="divFoot_c">
+                <div class="divFoot_c" data-role="controlgroup" data-type="horizontal">
+                    <a href="#" onClick="javascript:currentCurve.eraseCurve();" data-role="button" data-iconpos="right" data-icon="delete" >Remove</a>
+                </div>
+            </div>
+            <div class ="divFoot_c">
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#" onClick="javascript:currentCurve.play();" data-role="button" data-iconpos="right" data-icon="refresh">Replay Curve</a>
+                    <a href="#" onClick="javascript:currentCurve.stop();" data-role="button" data-iconpos="right" data-icon="stop">Stop</a>
+                </div>
+            </div>
+            <div class ="divFoot_r">
+                <div class="divFoot_r" data-role="controlgroup" data-type="horizontal">
+                    <a href="#" onClick="javascript:currentCurve.previousCurve();" data-role="button" data-iconpos="right" data-icon="arrow-l" >Previous Curve</a>
+                    <a href="#" onClick="javascript:currentCurve.nextCurve();" data-role="button" data-iconpos="left" data-icon="arrow-r" >Next Curve</a>                
+                </div>
+            </div>
+             
+            
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+
+
+
+    <!-- Start of second page -->
+    <div data-role="page" id="bar">
+
+        <div data-role="header">
+            <h1>Bar</h1>
+        </div><!-- /header -->
+        <div data-role="content">
+
+            <form id="osc-form" action="javascript:sendOscMsg('hey');" method="get">
+                <div data-role="fieldcontain">
+                    <label for="host">Host: </label>
+                    <input type="text" id="host" name="host" value="129.102.65.25" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" required placeholder="Host adress" />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <label for="port">Port: </label>
+                    <input type="number" id="port" name="port" value="1234" />
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="address">Address: </label>
+                    <input type="text" id="address" name="address" value="/spat/posxyz" required pattern="/.+" required placeholder="Enter a valid OSC adress (Starts with /)" />
+                </div>
+                <!--<div data-role="fieldcontain">
+                    <label for="args">Arguments: </label>
+                    <input type="text" id="args" name="args" value="hello" />
+                </div>-->
+
+                <fieldset class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button type="reset" onClick="this.form.reset()">Reset</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button type="submit" data-theme="f" class="ui-btn-hidden" aria-disabled="false">Send</button>
+                    </div>
+                </fieldset>        
+            </form>
+            <input id="back" type="button" value="BACK" onclick="location.href='#foo'"/>
+
+        </div><!-- /content -->
+
+        <div data-role="footer">
+
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jQueryMobile/jquery.mobile-1.3.2.min.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/OSCListener.js"></script>
+    <script type="text/javascript" src="js/OSCSender.js"></script>
+    <script type="text/javascript" src="libs/MadgwickAHRS.js"></script>
+    <script type="text/javascript" src="libs/three.min.js"></script>
+    <script type="text/javascript" src="libs/scene.js"></script>
+    <script type="text/javascript" src="js/fnc.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>

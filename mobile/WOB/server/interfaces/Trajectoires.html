@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<string name="app_name">Trajectoires</string>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height = device-height" />
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="libs/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.range.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src='interface.js'></script>
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src='libs/jquery.range.js'></script>
+    <script type="text/javascript" src='libs/simplify.js'></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/TimedCurve.js"></script>
+    <script type="text/javascript" src="js/Session.js"></script>
+    <script type="text/javascript" src="js/OSC.js"></script>
+    <script type="text/javascript" src="js/TrajManager.js"></script>
+    <script type="text/javascript" src="js/Utils.js"></script>
+    <script type="text/javascript" src="js/View.js"></script>
+    <script type="text/javascript" src="js/EventManager.js"></script>
+    <script type="text/javascript" src="js/Player.js"></script>
+    <script type="text/javascript" src="js/HTMLFunction.js"></script>
+    <script type="text/javascript" src="libs/hammer.js"></script>
+
+
+
+    <title>Trajectoires</title>
+
+</head>
+
+<body onresize="javascript:Trajectoires.View.traj_initCanvas()">
+
+    <!-- Start of first page -->
+    <div id="main-page" data-role="page" data-theme="a">
+
+        <div data-role="panel" id="settings-panel" data-theme="b" data-position="right" data-display="overlay">
+
+
+            <h1>Settings</h1>
+
+<!--             <label>Zoom: </label>
+            <div data-role="controlgroup" data-type="horizontal">
+                <a onClick="javascript:setCanvasZoom(0.8);" data-role="button" data-theme="a" data-inline="true"> - </a>
+                <a onClick="javascript:setCanvasZoom(1.2);" data-role="button" data-theme="a" data-inline="true"> + </a>
+            </div> -->
+
+            <label> Undo: </label>
+            <div>
+                <a onClick="javascript:Trajectoires.State.undo();" data-role="button" data-theme="a" data-icon="back" data-inline="true"></a> 
+            </div>
+
+            <label>Speakers Pos: </label>
+            <input type="number" id="speaker_dist" name="distHP" value="1" onchange="javascript:setHpDistance()" data-inline="true" />
+
+
+            <form>
+                <label for="flip-curvesinback">Draw Curves in Background:</label>
+                <select name="flip-curvesinback" id="flip-curvesinback" data-role="slider" data-theme="b" onchange="javascript:setDrawCurvesInBackground()">
+                    <option value="off">No</option>
+                    <option value="on" selected="selected">Yes</option>
+                </select>
+            </form>
+
+            <form>
+                <label for="flip-loop">Loop Mode:</label>
+                <select name="flip-loop" id="flip-loop" data-role="slider" data-theme="b" onchange="javascript:setLoopMode()">
+                    <option value="off" selected="selected">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+            <form>
+                <label for="flip-orientation">Stream Orientation:</label>
+                <select name="flip-orientation" id="flip-orientation" data-role="slider" data-theme="b" onchange="javascript:setOrientationMode()">
+                    <option value="off" selected="selected">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+
+            <form>
+                <label for="flip-timeSlider">Show Time Slider:</label>
+                <select name="flip-timeSlider" id="flip-timeSlider" data-role="slider" data-theme="b" onchange="javascript:setTimeSliderMode()">
+                    <option value="off">Off</option>
+                    <option value="on" selected="selected">On</option>
+                </select>
+            </form>
+
+            <form>
+                <label for="flip-timeSlider">Show Z Slider:</label>
+                <select name="flip-zSlider" id="flip-zSlider" data-role="slider" data-theme="b" onchange="javascript:setZSliderMode()">
+                    <option value="off" selected="selected">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+
+
+
+        </div>
+
+        <div id="header" data-role="header" class="ui-bar-a ui-header">
+            <a id="curveMenuButton" data-role="button" data-icon="gear" data-mini="true" data-inline="true" data-inline="true">Curve</a>
+            <a href="#settings-panel" data-icon="gear" class="ui-btn-right">Settings</a>
+            <h1 class="ui-title">Trajectoires</h1>
+            <!-- /header <a href="#settings-panel" data-icon="gear" class="ui-btn-right">OSC</a>-->
+        </div>
+        <!-- /header -->
+
+        <div id="sourceSlectDiv">
+            <button class='sourceButton' id='s1' data-role="none">
+                <div>1</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s2' data-role="none">
+                <div>2</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s3' data-role="none">
+                <div>3</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s4' data-role="none">
+                <div>4</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s5' data-role="none">
+                <div>5</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s6' data-role="none">
+                <div>6</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s7' data-role="none">
+                <div>7</div>
+            </button>
+            <br/>
+            <button class='sourceButton' id='s8' data-role="none">
+                <div>8</div>
+            </button>
+            <br/>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="bg-canvas" class="drawing-canvas"></canvas>
+            <canvas id="traj-canvas" class="drawing-canvas"></canvas>
+            <canvas id="dyn-canvas" class="drawing-canvas"></canvas>
+            <canvas id="current-canvas" class="drawing-canvas"></canvas>
+        </div>
+
+
+        <div id='drawZone' data-role="none">
+            <svg width="100" height="160" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                    <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+                    <ellipse id='drawZoneEl' ry="90" rx="61" id="svg_8" cy="86" cx="25" fill-opacity='0.6' fill="#ccf2a7" />
+                </g>
+            </svg>
+            <img id='drawZoneImg' src="libs/crayon.jpg" alt="image crayon" />
+        </div>
+
+        <div id='drawZoneRight' data-role="none">
+            <svg width="100" height="160" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                    <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+                    <ellipse id='drawZoneElRight' ry="90" rx="61" id="svg_8" cy="86" cx="80" fill-opacity='0.6' fill="#ccf2a7" />
+                </g>
+            </svg>
+            <img id='drawZoneImgRight' src="libs/crayon.jpg" alt="image crayon" />
+        </div>
+
+
+
+        <div id="divCurveMenu" class="left">
+            <a href="#" onClick="javascript:selectPreviousCurve();" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-l" data-inline="true">Previous</a>
+            <a id="lbl_current_curve" data-role="button" data-mini="true" data-inline="true" style="background: rgba(255, 255, 255, 0.7);" data-inline="true">0</a>
+            <a href="#" onClick="javascript:selectNextCurve();" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-r" data-inline="true">Next</a>
+            <div id="divCurveOptions" class="ui-bar ui-bar-a">
+                <div class="curveMenuButtonDiv">
+                    <a id='action' class="curveMenuButton" data-mini="true" data-role="none">Actions</a>
+                    <a id='prop' class="curveMenuButton" data-mini="true" data-role="none">Transform</a>
+                    <a id='multi' class="curveMenuButton" data-mini="true" data-role="none">Multiplay</a>
+                </div>
+
+                <div id="divCurveAction" class="ui-bar ui-bar-a">
+                    <a href="#" onClick="javascript:deleteCurrentCurve();" data-mini="true" data-role="button" data-icon="delete">Remove</a>
+                    <a href="#" onClick="javascript:modeSelectEdit();" data-mini="true" data-role="button" data-icon="edit">Select and redraw</a>
+                    <a href="#" onClick="javascript:duplicateCurrentCurve();" data-mini="true" data-role="button">Duplicate</a>
+                    <a href="#" onClick="javascript:copyCurrentCurve();" data-mini="true" data-role="button">Copy</a>
+                    <a href="#" onClick="javascript:pasteInCurrentCurve();" data-mini="true" data-role="button">Paste</a>
+                    <div class="ui-bar ui-bar-a">
+                        <label>Simplify Curve</label>
+                        <fieldset data-role="controlgroup" data-type="horizontal">
+                            <a onclick="javascript:simplifyCurrentCurve(0.01)" data-inline="true" data-mini="true" data-role="button"> Soft </a>
+                            <a onclick="javascript:simplifyCurrentCurve(0.1)" data-inline="true" data-mini="true" data-role="button"> Hard </a>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div id="divCurveProp" class="ui-bar ui-bar-a">
+                    <div id="spaceStretchDiv" class="ui-bar ui-bar-a" style="float:left">
+                        <label>Space stretch</label>
+                        <div data-inline="true" style="float:left">
+                            <fieldset data-role="controlgroup" data-type="vertical">
+                                <a class="content" data-role="none">x </a>
+                                <a onClick="javascript:changeScale('x',1.2);" class="miniButton" data-role="button" data-theme="a"> + </a>
+                                <a onClick="javascript:changeScale('x',0.8);" class="miniButton" data-role="button" data-theme="a"> - </a>
+                                <a onClick="javascript:mirror('x');" class="miniButtonText" data-role="button" data-theme="a"> Mirror </a>
+                            </fieldset>
+                        </div>
+                        <div data-inline="true" style="float:left">
+                            <fieldset data-role="controlgroup" data-type="vertical">
+                                <a class="content" data-role="none">y </a>
+                                <a onClick="javascript:changeScale('y',1.2);" class="miniButton" data-role="button" data-theme="a"> + </a>
+                                <a onClick="javascript:changeScale('y',0.8);" class="miniButton" data-role="button" data-theme="a"> - </a>
+                                <a onClick="javascript:mirror('y');" class="miniButtonText" data-role="button" data-theme="a"> Mirror </a>
+                            </fieldset>
+                        </div>
+                        <div data-inline="true" style="float:left">
+                            <fieldset data-role="controlgroup" data-type="vertical">
+                                <a class="content" data-role="none">z </a>
+                                <a onClick="javascript:changeScale('z',1.2);" class="miniButton" data-role="button" data-theme="a"> + </a>
+                                <a onClick="javascript:changeScale('z',0.8);" class="miniButton" data-role="button" data-theme="a"> - </a>
+                                <a onClick="javascript:mirror('z');" class="miniButtonText" data-role="button" data-theme="a"> Mirror </a>
+                            </fieldset>
+                        </div>
+                        <div data-inline="true" style="float:left">
+                            <fieldset data-role="controlgroup" data-type="vertical">
+                                <a class="content" data-role="none" style="padding-left:4px!important">rotate </a>
+                                <a id="rotateLeft" class="miniButton" data-role="button" data-theme="a" data-icon="back"> </a>
+                                <a id="rotateRight" class="miniButton" data-role="button" data-theme="a" data-icon="forward"> </a>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div id="timeStretchDiv" class="ui-bar ui-bar-a" style="float:left">
+                        <label>Time stretch</label>
+                        <input type="number" data-role='none' id="timeStretch" data-inline="true" value="1" onchange="javascript:changeTime()" style="width:80px;" /> ms
+                        <a onClick="javascript:mirror('t');" data-inline="true" class="miniButtonText" data-role="button" data-theme="a"> Reverse </a>
+                    </div>
+                    <div id="positionDiv" class="ui-bar ui-bar-a" style="float:left">
+                        <label>First point position</label>
+                        <input data-role='none' type="number" id="xOriPos" value="1" data-inline="true" onchange="javascript:translateCurve()" />x
+                        <input data-role='none' type="number" id="yOriPos" value="1" data-inline="true" onchange="javascript:translateCurve()" />y
+                        <input data-role='none' type="number" id="zOriPos" value="1" data-inline="true" onchange="javascript:translateCurve()" />z
+                    </div>
+
+                </div>
+
+                <div id="divCurveMulti" class="ui-bar ui-bar-a">
+                    <div class="ui-bar ui-bar-a">
+                        <label>Source controled</label>
+                        <input data-role='none' type="number" id="sourceControled" value="1" onchange="javascript:changeSourceControled()" />
+                    </div>
+                    <label>
+                        <input type="checkbox" id="checkPlay" onchange="javascript:activeMultiPlay()"> Active
+                    </label>
+                    <label>
+                        <a data-role="button" onclick="javascript:removeMultiPlay()">Remove all </a>
+                    </label>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="sessionDiv">
+            <a id="lblCurrentSession" data-role="button" data-mini="true" data-inline="true" data-inline="true">0</a>
+            <div id="sessionDivOverCanvas">
+                <a onClick="javascript:Trajectoires.Session.selectPreviousSession();" data-inline="true" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-l"> Previous </a>
+                <a onClick="javascript:Trajectoires.Session.selectNextSession();" data-inline="true" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-r"> Next </a>
+                <a onClick="javascript:Trajectoires.Session.newSession();" data-inline="true" data-mini="true" data-role="button" data-icon="plus" data-iconpos="notext"> New </a>
+                <a onClick="javascript:Trajectoires.Session.deleteSelectedSession();" data-inline="true" data-mini="true" data-role="button" data-icon="delete" data-iconpos="notext"> Delete </a>
+            </div>
+        </div>
+
+
+
+        <div class="canvas-left-overlay" id="playDiv">
+            <div data-role="controlgroup" data-type="horizontal" >
+                <a onClick="javascript:setCanvasZoom(0.8);" data-role="button" data-theme="a" data-inline="true" style="background: rgba(250, 250, 250, 0.5);"> - </a>
+                <a onClick="javascript:setCanvasZoom(1.2);" data-role="button" data-theme="a" data-inline="true" style="background: rgba(250, 250, 250, 0.5);"> + </a>
+            </div>
+            <div data-role="controlgroup" data-type="vertical">
+                <a id="playButton" data-role="button" data-theme="a" style="background: rgba(250, 250, 250, 0.5); padding: 5px; width:50px; height:30px; line-height: 30px;">Play</a>
+                <a id="multiplayButton" data-role="button" data-theme="a" style="background: rgba(250, 250, 250, 0.5);padding: 5px; width:50px;height:30px; line-height: 30px;">Multi</a>
+            </div>
+        </div>
+
+        <div id="ZSliderDiv" style: "position: absolute, bottom:40">
+            <input type="hidden" class="ZSlider" value="0" />
+        </div>
+
+
+
+        <!--    <div id="tapHoldMenu" data-role="controlgroup">
+         <FORM NAME="myform" ACTION="" METHOD="GET">
+            Enter something in the box: <BR>
+            <INPUT TYPE="text" NAME="inputbox" VALUE=" 1"><P>
+            <INPUT TYPE="button" NAME="button" Value="Click" onClick="testResults(this.form)">
+        </FORM> -->
+        <!-- <a href="#" class="ui-btn ui-corner-all">Options</a>
+      <a href="#" class="ui-btn ui-corner-all">Copy</a>
+      <a href="#" class="ui-btn ui-corner-all">Paste</a> 
+      <a id="selectButton" data-role="button">Select</a>
+    </div>-->
+
+        <div id="contextMenu" style="position:absolute;top:100px;left 300px">
+            <button id="newButton"> New </button>
+            <button id="circularButton"> Circular </button>
+            <button id="concatButton"> Concat </button>
+        </div>
+
+        <div id="longTouchMenu" style="position:absolute;top:100px;left 300px">
+            <a href="#" onClick="javascript:deleteCurrentCurve();" data-mini="true" data-role="button" data-icon="delete">Remove</a>
+            <a href="#" onClick="javascript:modeSelectEdit();" data-mini="true" data-role="button" data-icon="edit">Select and redraw</a>
+            <a href="#" onClick="javascript:duplicateCurrentCurve();" data-mini="true" data-role="button">Duplicate</a>
+            <a href="#" onClick="javascript:copyCurrentCurve();" data-mini="true" data-role="button">Copy</a>
+            <a href="#" onClick="javascript:pasteInCurrentCurve();" data-mini="true" data-role="button">Paste</a>
+        </div>
+
+
+
+        <div class="canvas-bot-overlay" id="slider-div" style: "position: absolute, bottom:40">
+            <input type="hidden" class="timeSlider" value="0" />
+            <!--         <span id="timeValue"> 0 </span>
+        <input data-role="none" type="range" class="timeSlider" id="timeSlider" value="0" min="0" max="100" step="1" >
+        <input data-role="none" type="range" class="timeSlider" id="timeSliderEnd" value="0" min="0" max="100" step="1" >
+        <span id="timeValueEnd"> 0 </span> -->
+        </div>
+
+
+        <div id=footer data-role="footer">
+            <div class="right" id="options-div">
+                <a href="#" onClick="javascript:exportCurrentCurve();" data-mini="true" data-role="button">Export</a>
+                <!--<a href="#" onClick="javascript:exportCurrentCurveAsAntescofoNIM();" data-mini="true" data-role="button">AntescofoNIM</a>   -->
+            </div>
+
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            Trajectoires.initialize();
+            $.mobile.loading().hide();
+        });
+    </script>
+</body>
+
+</html>

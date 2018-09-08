@@ -1,0 +1,28 @@
+{
+  "name": "WOB",
+  "description": "Web-OSC-Bridge-Server",
+  "main": "index.html",
+  "version": "0.12.1",
+  "window": {
+    "title": "Web-OSC-Bridge",
+    "show": true,
+    "toolbar": false,
+    "icon": "/icon-design/wob-icon.png",
+    "frame": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://forge.ircam.fr/p/trajectories/source/tree/master/mobile/WOB"
+  },
+  "dependencies": {
+    "connect": "2.29.1",
+    "omgosc": "1.0.0",
+    "qr-image": "^3.1.0",
+    "ws": "0.7.1"
+  },
+  "devDependencies": {
+    "node-webkit-builder": "1.0.11",
+    "gulp": "3.8.11",
+    "gulp-util": "3.0.4"
+  }
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<string name="app_name">Skecth1</string>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height = device-height" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" href="libs/jQueryMobile/jquery.mobile-1.4.5.min.css">
+
+
+
+    <title>Trajectories</title>
+</head>
+
+<body onresize="javascript:traj_initCanvas()">
+
+    <!-- Start of first page -->
+    <div id="main-page" data-role="page" data-theme="a">
+
+        <div data-role="panel" id="osc-settings-panel" data-theme="b" data-position="right" data-display="overlay">
+
+            <h1>OSC Settings</h1>
+
+            <form id="osc-form" action="javascript:osc_startOSC();" method="get">
+                <div data-role="ui-field-contain">
+                    <label for="host">Host: </label>
+                    <input type="text" id="host" name="host" value="129.102.64.181" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" required placeholder="Host adress" />
+                </div>
+
+
+                <div data-role="ui-field-contain">
+                    <label for="port">Port: </label>
+                    <input type="number" id="port" name="port" value="2000" />
+                </div>
+
+                <fieldset class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button type="reset" onClick="this.form.reset()">Reset</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button type="submit" data-theme="c">Set</button>
+                    </div>
+
+                </fieldset>
+            </form>
+        </div>
+
+
+        <div data-role="panel" id="settings-panel" data-theme="b" data-position="left" data-display="overlay">
+
+            <h1>Settings</h1>
+
+            <label>Speakers Pos: </label>
+            <input type="number" id="speaker_dist" name="distHP" value="1" onchange="javascript:setHpDistance()" data-inline="true" />
+
+            <div class=vertical-spacer> </div>
+
+            <label>Zoom: </label>
+            <fieldset class="ui-grid-a">
+                <div class="ui-block-a">
+                    <a onClick="javascript:setCanvasZoom(0.8);" data-role="button" data-icon="minus" data-inline="true"></a>
+                </div>
+                <div class="ui-block-b">
+                    <a onClick="javascript:setCanvasZoom(1.2);" data-role="button" data-icon="plus" data-inline="true"></a>
+                </div>
+
+            </fieldset>
+
+            <div class=vertical-spacer> </div>
+
+
+            <form>
+                <label for="flip-curvesinback">Draw Curves in Background:</label>
+                <select name="flip-curvesinback" id="flip-curvesinback" data-role="slider" data-theme="b" onchange="javascript:setDrawCurvesInBackground()">
+                    <option value="off">No</option>
+                    <option value="on" selected="selected">Yes</option>
+                </select>
+            </form>
+
+
+        </div>
+
+        <div id=h eader data-role="header" class="ui-bar-a ui-header">
+            <a href="#settings-panel" data-icon="grid" class="ui-btn-left">Settings</a>
+            <h1 class="ui-title">Trajectories</h1>
+            <a href="#osc-settings-panel" data-icon="gear" class="ui-btn-right">OSC</a>
+        </div>
+        <!-- /header -->
+
+        <div class="canvas-container">
+            <canvas id="bg-canvas" class="drawing-canvas"></canvas>
+            <canvas id="traj-canvas" class="drawing-canvas"></canvas>
+            <canvas id="dyn-canvas" class="drawing-canvas"></canvas>
+        </div>
+
+        <!-- Not necessary on my phone ;)
+        <div class="canvas-right-overlay">
+            <div data-role="controlgroup" data-type="vertical">
+                <a onClick="javascript:sendTriggerPlay();" data-role="button" data-theme="a" style="background: rgba(255, 255, 255, 0.7);">Play
+                </a>
+                <a onClick="javascript:sendTriggerRecord();" data-role="button" data-theme="a" style="background: rgba(255, 255, 255, 0.7);">Rec</a>
+            </div>
+
+    </div>
+-->
+
+        <div id=footer data-role="footer">
+
+            <div class="left">
+                <a href="#" onClick="javascript:deleteCurrentCurve();;" data-mini="true" data-role="button" data-icon="delete" data-iconpos="notext">Remove</a>
+                <a href="#" onClick="javascript:selectPreviousCurve();" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-l">Previous</a>
+                <a id="lbl_current_curve" data-role="button" data-mini="true" data-inline="true" style="background: rgba(255, 255, 255, 0.7);">0</a>
+                <a href="#" onClick="javascript:selectNextCurve();" data-mini="true" data-role="button" data-iconpos="notext" data-icon="arrow-r">Next</a>
+            </div>
+
+            <div class="right">
+                <a href="#" onClick="javascript:playCurrentCurve();" data-mini="true" data-role="button">Replay</a>
+                <a href="#" onClick="javascript:stopCurrentCurve();" data-mini="true" data-role="button">Stop</a>
+            </div>
+
+
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->
+
+
+
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jQueryMobile/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="js/logger.js"></script>
+    <script type="text/javascript" src="js/OSCManager.js"></script>
+    <script type="text/javascript" src="js/TimedCurve.js"></script>
+    <script type="text/javascript" src="js/TrajectoriesManager.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+
+
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>

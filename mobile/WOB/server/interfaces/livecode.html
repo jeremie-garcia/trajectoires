@@ -1,0 +1,15 @@
+<html>
+<head>
+  <script src='interface.js'></script>
+</head>
+<body>
+  <p>livecode interface ready.</p>
+  <script>
+  panel = new Interface.Panel();
+  
+  Interface.Socket.receive = function( data ) {
+    Interface.Livecode._receive( data )
+  }
+  </script>
+</body>
+</html>

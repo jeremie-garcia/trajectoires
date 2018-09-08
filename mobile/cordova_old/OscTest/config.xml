@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="fr.ircam.efficace.mob" version="1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>OscTest</name>
+    <description>
+        Simple Message sending app.
+    </description>
+    <author email="jgarcia@ircam.fr" href="http://www.ircam.fr">
+        RepMus Team
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <feature name="OSC">
+        <param name="id" value="nl.sylvain.cordova.osc" />
+        <param name="url" value="https://github.com/sy1vain/cordova-osc-plugin.git#:." />
+    </feature>
+</widget>

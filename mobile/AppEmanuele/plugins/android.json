@@ -1,0 +1,36 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"OSC\"><param name=\"android-package\" value=\"fr.ircam.efficace.cordova.osc.OSCUtils\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "fr.ircam.efficace.cordova.osc": {
+            "PACKAGE_NAME": "fr.ircam.repmus.efficace.cordova.imu"
+        }
+    },
+    "dependent_plugins": {}
+}

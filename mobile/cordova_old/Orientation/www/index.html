@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<string name="app_name">Orientation</string>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <link rel="stylesheet" href="libs/jQueryMobile/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+
+
+    <title>Orientation</title>
+</head>
+
+<body>
+    <!-- Start of first page -->
+    <div id="home-page" data-role="page">
+
+        <div data-role="panel" id="osc-settings-panel" data-position="right" data-display="overlay">
+
+            <h1>OSC Settings</h1>
+        
+           <form id="osc-form" action="javascript:startOscSend();" method="get">
+                <div data-role="fieldcontain">
+                    <label for="host">Host: </label>
+                    <input type="text" id="host" name="host" value="129.102.64.181" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" required placeholder="Host adress" />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <label for="port">Port: </label>
+                    <input type="number" id="port" name="port" value="1234" />
+                </div>
+
+                <fieldset class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <button type="reset" onClick="this.form.reset()">Reset</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button type="submit" data-theme="c">Set</button>
+                    </div>
+
+
+                </fieldset>
+            </form>
+            <!--   <div class=" led "></div>  Not working yet-->
+    
+        </div>
+
+
+        <div data-role="header" >
+            <h1>Orientation</h1>
+             <a href="#osc-settings-panel" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">OSC</a>
+        </div>
+        <!-- /header -->
+
+        <div data-role="content" role="main">
+            <a data-role="button" id="record-btn">Button</a>
+        </div>
+
+
+
+    </div>
+    <!-- /page -->
+
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jQueryMobile/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="js/osc.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>

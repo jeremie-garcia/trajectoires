@@ -1,0 +1,78 @@
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+
+body {
+    margin : 0%;
+    -webkit-touch-callout: none;
+    /* prevent callout to copy image, etc when tap to hold */
+    
+    -webkit-text-size-adjust: none;
+    /* prevent webkit from resizing text to fit */
+    
+    -webkit-user-select: none;
+    /* prevent copy paste, to allow, change 'none' to 'text' */
+    
+    background-color: #FFFFFF;
+    background-image: linear-gradient(top, #CCC 0%, #FFFFFF 51%);
+    background-image: -webkit-linear-gradient(top, #CCC 0%, #FFFFFF 51%);
+    background-image: -ms-linear-gradient(top, #CCC 0%, #FFFFFF 51%);
+    background-image: -webkit-gradient( linear, left top, left bottom, color-stop(0, #CCC), color-stop(0.51, #FFFFFF));
+    background-attachment: fixed;
+    font-size: 12px;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+
+/* Big button */
+
+#record-btn {
+    text-align: center;
+    vertical-align: center;
+    margin: auto auto;
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 20% !important;
+    background-color: rgba(253, 90, 90, 0.83); 
+}
+
+#record-btn span span {
+
+}
+
+
+/* LED */
+
+.led {
+    position:   inline;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: #000 0 -1px 6px 1px;
+}
+
+.led-red {
+    background-color: #F00;
+    box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
+}
+
+.led-orange {
+    background-color: #FF7000;
+    box-shadow: #000 0 -1px 6px 1px, inset #630 0 -1px 8px, #FF7000 0 3px 11px;
+}
+
+.led-yellow {
+    background-color: #FF0;
+    box-shadow: #000 0 -1px 6px 1px, inset #660 0 -1px 8px, #FF0 0 3px 11px;
+}
+
+.led-green {
+    background-color: #80FF00;
+    box-shadow: #000 0 -1px 6px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;
+}

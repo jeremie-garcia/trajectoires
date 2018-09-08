@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+           id="fr.ircam.efficace.cordova.osc"
+      version="0.1.0">
+    <name>OSC</name>
+
+    <js-module src="www/OSCListener.js" name="OSCListener">
+        <clobbers target="window.OSCListener" />
+    </js-module>
+    <js-module src="www/OSCSender.js" name="OSCSender">
+        <clobbers target="window.OSCSender" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+    	<!-- bind the correct module -->
+    	<config-file target="res/xml/config.xml" parent="/*">
+            <feature name="OSC" >
+                <param name="android-package" value="fr.ircam.efficace.cordova.osc.OSCUtils"/>
+            </feature>
+        </config-file>
+
+        <!-- allow it to access the network -->
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
+        </config-file>
+
+        <!-- copy the source files -->
+        <source-file src="src/android/OSCUtils.java" target-dir="src/fr/ircam/efficace/cordova/osc" />
+
+        <!-- copy the osc source files -->
+		<source-file src="libs/javaosc-core-0.3.jar" target-dir="libs" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <!-- bind the correct module -->
+        <config-file target="config.xml" parent="/*">
+            <feature name="OSC">
+                <param name="ios-package" value="CDVOSC" /> 
+            </feature>
+        </config-file>
+
+        <!-- copy the source files -->
+        <header-file src="src/ios/CDVOSC.h" />
+        <source-file src="src/ios/CDVOSC.m" />
+
+        <header-file src="src/ios/CocoaOSC/GCDAsyncSocket.h" />
+        <source-file src="src/ios/CocoaOSC/GCDAsyncSocket.m" />
+        <header-file src="src/ios/CocoaOSC/GCDAsyncUdpSocket.h" />
+        <source-file src="src/ios/CocoaOSC/GCDAsyncUdpSocket.m" />
+        <header-file src="src/ios/CocoaOSC/CocoaOSC.h" />
+        <header-file src="src/ios/CocoaOSC/NS+OSCAdditions.h" />
+        <source-file src="src/ios/CocoaOSC/NS+OSCAdditions.m" />
+        <header-file src="src/ios/CocoaOSC/OSCConnection.h" />
+        <source-file src="src/ios/CocoaOSC/OSCConnection.m" />
+        <header-file src="src/ios/CocoaOSC/OSCConnectionDelegate.h" />
+        <header-file src="src/ios/CocoaOSC/OSCDispatcher.h" />
+        <source-file src="src/ios/CocoaOSC/OSCDispatcher.m" />
+        <header-file src="src/ios/CocoaOSC/OSCPacket.h" />
+        <source-file src="src/ios/CocoaOSC/OSCPacket.m" />
+        <header-file src="src/ios/CocoaOSC/RegexKitLite.h" />
+        <source-file src="src/ios/CocoaOSC/RegexKitLite.m" compiler-flags="-fno-objc-arc" />
+
+        <framework src="libicucore.dylib" />
+        <framework src="Security.framework" />
+        <framework src="CFNetwork.framework" />
+
+    </platform>
+
+</plugin>

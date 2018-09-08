@@ -1,0 +1,390 @@
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    margin: 0%;
+    -webkit-touch-callout: none;
+    /* prevent callout to copy image, etc when tap to hold */
+    
+    -webkit-text-size-adjust: none;
+    /* prevent webkit from resizing text to fit */
+    
+    -webkit-user-select: none;
+    /* prevent copy paste, to allow, change 'none' to 'text' */
+    
+    background-color: #FFFFFF;
+    font-size: 12px;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+
+
+.vertical-spacer {
+    height: 20px;
+    line-height: 0;
+}
+/* CANVAS CSS */
+
+.canvas-container {
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.drawing-canvas {
+    position: absolute;
+}
+
+#dyn-canvas {
+    z-index: 2;
+    background: transparent;
+}
+
+#traj-canvas {
+    z-index: 1;
+    background: transparent;
+}
+
+#bg-canvas {
+    z-index: 0;
+    border: solid black 1px;
+}
+
+.canvas-right-overlay {
+    position: absolute;
+    top: 20%;
+    right: 0;
+    vertical-align: center;
+    z-index: 3;
+}
+
+.canvas-left-overlay {
+    position: absolute;
+    top: 30%;
+    left: 0;
+    vertical-align: center;
+    z-index: 3;
+}
+
+.canvas-bot-overlay {
+    position: fixed;
+    bottom: 60px;
+    width: device-width;
+    height: 30px;
+    left: 100px;
+    vertical-align: center;
+    z-index: 3;
+    opacity: 0.7;
+}
+
+
+
+/* OLD */
+/*#sourceSelect {
+    position: absolute;
+    bottom: 10px;
+    height: 200px;
+    width: 200px;
+}
+.buttonSource {
+    position:absolute;
+    top:20px;
+    left:5px;
+    height: 30px;
+    width:30px;
+    border-radius: 20px;
+    z-index: 5;
+}
+.sourceInput {
+    width: 20px;
+    height: 20px;
+    margin: 10px;
+}*/
+
+
+/* NEW */
+.sourceButton{
+    margin : -3px;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    width: 30px;
+    height: 30px;
+    opacity: 0.8;
+    display: block;
+}
+.sourceButton div {
+    padding: 0;
+    opacity: 0.8;
+    border-radius: 50%;
+    width: 23px;
+    height: 23px;
+    background-color: green;
+    text-align: center;
+    font-size: 130%;
+}
+/*.sourceButton:hover {
+    background-color: green;
+}*/
+
+#sourceSlectDiv {
+    position : absolute;
+    top : 40px;
+    right: 10px;
+    z-index : 4;
+}
+
+
+.ui-checkbox input, .ui-radio input {
+    width: 20px;
+    height: 20px;
+    margin: 10px;
+}
+/*#timeValue {
+    position: absolute;
+    width: 40px;
+    bottom : 20px;
+}*/
+
+#ZSliderDiv {
+    position:absolute;
+    top:110px;
+    left: 60px;
+    width: 50px;
+    z-index: 4;
+    -webkit-transform:rotate(90deg);
+    opacity: 0.7;
+}
+
+.transparent {
+    background-color: rgb(0, 0, 0);
+    /* RGBa with 0.6 opacity */
+    
+    background-color: rgba(255, 255, 255, 0.6);
+    background: transparent;
+}
+
+#footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+
+.right {
+    position: absolute;
+    right: 0px;
+    bottom: 0;
+    margin: 0px;
+}
+
+.left {
+    position: absolute;
+    left: 0;
+    opacity: 0.8;
+    z-index: 5;
+    width : 280px;
+}
+
+a.curveMenuButton {
+    margin: 0px;
+    padding: 0px;
+    padding-bottom: 15px;
+    padding-top: 10px;
+    color : black !important;
+    border-color: black;
+    border-style: solid;
+    border-width: 2px;
+    text-align: center;
+}
+
+.content {
+    margin: 0px;
+    padding: 0px;
+    border-width: 2px;
+    padding-right: 5px!important;
+    padding-left: 20px!important;
+    color: black!important;
+    font: 13px Arial; 
+}
+
+.curveMenuButtonDiv {
+    /* style basique */
+    width: 100%;
+    margin-bottom: 0px;
+    border: 1px solid #666666;
+    border-bottom-color: #ECEDEE;
+    font: 15px Arial; 
+
+    /* instaure la flexbox */
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.curveMenuButtonDiv > a {
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 30px; /* Pour faire fonctionner correctement la transition. (Les transitions vers "width:auto" sont buggées dans Gecko et Webkit, au moins. Voir http://bugzil.la/731886 pour plus d'informations.) */
+    -webkit-transition: width 0.7s ease-out;
+    transition: width 0.7s ease-out;
+    border-radius: 2px;
+    border-left: 0px;
+    border-color: #666666;
+}
+
+.curveMenuButton:first-child {
+    border-left: 1px solid #666666;
+}
+
+#spaceStretchDiv {
+    display: inline;
+}
+#spaceStretchDiv > input {
+    width: 50px;
+}
+
+#positionDiv {
+    display: inline;
+}
+#positionDiv > input {
+    width: 50px;
+}
+
+#sessionDiv {
+    position: absolute;
+    left: 0px; 
+    bottom :0;
+    z-index: 4;
+}
+
+#sessionDivOverCanvas {
+  position: absolute;
+  left: 0;
+  bottom: 50px;
+  z-index: 4;
+  background-color: rgba(255, 255, 255, 1);
+}
+
+
+#curveMenuDiv {
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+#divCurveOptions {
+    padding: 0px;
+    margin: 0px; 
+    background-color: rgba(255, 255, 255, 1);
+}
+
+
+#touchLongMenu {
+  position: absolute;
+  z-index: 3;
+  width : 100px;
+  top : 20%;
+  right: 20%
+}
+
+#header > a {
+    height: 16px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+#footer {
+    height:40px;
+}
+
+/*#footer > a {
+    padding-bottom: 3px;
+    padding-top: 3px;
+    margin-bottom: 1px;
+}*/
+
+
+#spaceStretchDiv > input {
+    width: 50px;
+
+}
+
+.miniButton{
+    width: 15px;
+    height: 15px;
+    margin: 15px;
+    padding: 15px;
+
+}
+
+.miniButtonText {
+    padding: 0px;
+    padding-top: 15px;
+    width: 45px;
+    height: 30px;
+    font-size:10px;
+}
+
+#drawZone {
+    position: absolute;
+    bottom:65px;
+    left:0px;
+    width:100px;
+    height: 140px;
+    z-index: 4;
+}
+#drawZoneEl {
+    position: relative;
+    z-index: 4;
+}
+
+#drawZoneRight {
+    position: absolute;
+    bottom:65px;
+    right:0px;
+    width:100px;
+    height: 140px;
+    z-index: 4;
+}
+
+#drawZoneImg {
+    position: absolute;
+    bottom: 10px;
+    left:8px;
+    opacity: 0.5;
+    width: 60px;
+    height: 80px;
+    z-index:0 ;
+}
+
+#drawZoneImgRight {
+    position: absolute;
+    bottom: 10px;
+    left:35px;
+    opacity: 0.5;
+    width: 60px;
+    height: 80px;
+    z-index:0 ;
+
+}
+
+
+
+.circularButton {
+    z-index: 5!important;
+}
+
+label {
+    margin-bottom: 0px !important;
+}

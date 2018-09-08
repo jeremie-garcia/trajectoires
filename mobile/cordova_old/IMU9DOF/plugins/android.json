@@ -1,0 +1,65 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"OSC\"><param name=\"android-package\" value=\"nl.sylvain.cordova.osc.OSCUtils\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Accelerometer\"><param name=\"android-package\" value=\"org.apache.cordova.devicemotion.AccelListener\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Compass\"><param name=\"android-package\" value=\"org.apache.cordova.deviceorientation.CompassListener\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Gyroscope\"><param name=\"android-package\" value=\"org.dartlang.phonegap.gyroscope.GyroscopeListener\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "fr.ircam.efficace.cordova.osc": {
+            "PACKAGE_NAME": "fr.ircam.efficace.cordova.imu"
+        },
+        "org.apache.cordova.device-motion": {
+            "PACKAGE_NAME": "fr.ircam.efficace.cordova.imu"
+        },
+        "org.apache.cordova.device-orientation": {
+            "PACKAGE_NAME": "fr.ircam.efficace.cordova.imu"
+        },
+        "org.dartlang.phonegap.gyroscope": {
+            "PACKAGE_NAME": "fr.ircam.efficace.cordova.imu"
+        }
+    },
+    "dependent_plugins": {}
+}

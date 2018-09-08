@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<string name="app_name">Skecth1</string>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, target-densitydpi=medium-dpi" />
+
+    <link rel="stylesheet" href="libs/jQM-flat/jquery.mobile.flatui.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+    <title>Osc Send</title>
+</head>
+
+<body onload="startup();">
+    <div id="app">
+            
+        <!-- Start of first page -->
+        <div data-role="page" id="foo">
+
+            <div data-role="header">
+            </div><!-- /header -->
+
+         <!--   <div id="canvasDiv" data-role="content"> -->
+                <canvas id="canvas" class="drawing-canvas" width="800" height="600px" style="position: absolute;z-index:1;" >
+                </canvas>
+                <canvas id="canvasAxis" class="drawing-canvas" width="800" height="600px" style="position: absolute; z-index:0;" >
+                </canvas>
+            <!-- </div> -->   
+                
+            
+            <div id="menu" data-role="content">
+             <!--   <input id="erase" type="button" value="erase" onclick="erase();"/>  -->            
+                <input id="configOSC" type="button" value="OSC Config" onclick="location.href='#bar'"/>            
+                <fieldset class="ui-grid-a" >
+                    <div class="ui-block-a">
+                        <button type="button" onClick="javascript:zoom(1.2);">ZoomIn</button>
+                    </div>
+                    <div class="ui-block-b">
+                        <button type="button" data-theme="f" class="ui-btn-hidden" aria-disabled="false" onClick="javascript:zoom(0.8);">ZoomOut</button>
+                    </div>
+                    <div class="ui-block-a">
+                        <button type="button" onClick="javascript:sendOscMsg(curve.Collect());">Resend Curve</button>
+                    </div>
+                    
+                </fieldset>        
+            </div>
+            
+            
+            
+            
+            <div data-role="footer">
+
+            </div><!-- /footer -->
+        </div><!-- /page -->
+
+        
+        
+        
+        
+        <!-- Start of second page -->
+        <div data-role="page" id="bar">
+
+            <div data-role="header">
+                <h1>Bar</h1>
+            </div><!-- /header -->
+            <div data-role="content">
+
+                <form id="osc-form" action="javascript:sendOscMsg('hey');" method="get">
+                    <div data-role="fieldcontain">
+                        <label for="host">Host: </label>
+                        <input type="text" id="host" name="host" value="129.102.65.25" required pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" required placeholder="Host adress" />
+                    </div>
+
+                    <div data-role="fieldcontain">
+                        <label for="port">Port: </label>
+                        <input type="number" id="port" name="port" value="1234" />
+                    </div>
+                    <div data-role="fieldcontain">
+                        <label for="address">Address: </label>
+                        <input type="text" id="address" name="address" value="/test" required pattern="/.+" required placeholder="Enter a valid OSC adress (Starts with /)" />
+                    </div>
+                    <!--<div data-role="fieldcontain">
+                        <label for="args">Arguments: </label>
+                        <input type="text" id="args" name="args" value="hello" />
+                    </div>-->
+
+                    <fieldset class="ui-grid-a">
+                        <div class="ui-block-a">
+                            <button type="reset" onClick="this.form.reset()">Reset</button>
+                        </div>
+                        <div class="ui-block-b">
+                            <button type="submit" data-theme="f" class="ui-btn-hidden" aria-disabled="false">Send</button>
+                        </div>
+                    </fieldset>        
+                </form>
+                <input id="back" type="button" value="BACK" onclick="location.href='#foo'"/>
+
+            </div><!-- /content -->
+
+            <div data-role="footer">
+
+            </div><!-- /footer -->
+        </div><!-- /page -->
+
+
+
+    </div>
+
+
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jQueryMobile/jquery.mobile-1.3.2.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/OSCListener.js"></script>
+    <script type="text/javascript" src="js/OSCSender.js"></script>
+    <script type="text/javascript" src="js/fnc.js"></script>
+   
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+</body>
+
+</html>
