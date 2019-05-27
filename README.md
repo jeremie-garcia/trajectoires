@@ -1,4 +1,4 @@
-<img src="docs/app-icon.png" align="right" width=200>
+<img src="doc/app-icon.png" align="right" width=200>
 
 # Trajectoires
 
