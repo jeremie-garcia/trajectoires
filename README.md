@@ -2,8 +2,6 @@
 
 # Trajectoires
 
-**WebOSCBridge Application Server**
-
 © Ircam UMR 9912 STMS, 2014-2015
 Xavier Favory, Jérémie Garcia, Jean Bresson
 

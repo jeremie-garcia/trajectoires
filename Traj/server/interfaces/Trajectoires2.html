@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=1.0, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height = device-height" />
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="libs/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.range.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+    <!-- External Scripts -->
+    <script type="text/javascript" src='interface.js'></script>
+    <script type="text/javascript" src="libs/fastclick.min.js"></script>
+    <script type="text/javascript" src="libs/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src='libs/jquery.range.js'></script>
+    <script type="text/javascript" src='libs/simplify.js'></script>
+    <script type="text/javascript" src="libs/hammer.min.js"></script>
+
+    <!-- Internal Scripts -->
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/osc.js"></script>
+    <script type="text/javascript" src="js/timedCurve.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+    <script type="text/javascript" src="js/view.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/session.js"></script>
+    <script type="text/javascript" src="js/manager.js"></script>
+    <script type="text/javascript" src="js/events.js"></script>
+
+    <title>Trajectoires</title>
+
+</head>
+
+<body onresize="javascript:Traj.View.initCanvas()">
+
+    <!-- Start of first page -->
+    <div id="main-page" data-role="page" data-theme="a">
+
+        <div data-role="panel" id="settings-panel" data-theme="b" data-position="right" data-display="overlay">
+
+
+            <h1>Settings</h1>
+             <label>Speakers Pos: </label>
+             <input type="number" id="speaker_dist" name="distHP" value="1" data-mini="true" onchange="javascript:Traj.View.updateHpDistance()" data-inline="true" />
+
+            <form>
+                <label for="flip-curvesinback">Draw Curves in Background:</label>
+                <select name="flip-curvesinback" id="flip-curvesinback" data-role="slider" data-theme="b" data-mini="true" onchange="javascript:Traj.View.updateDrawCurvesInBackground()">
+                    <option value="off">No</option>
+                    <option value="on" selected="selected">Yes</option>
+                </select>
+            </form>
+
+            
+
+            <form>
+                <label for="flip-timeSlider">Show Time Slider:</label>
+                <select name="flip-timeSlider" id="flip-timeSlider" data-role="slider" data-theme="b" data-mini="true" onchange="javascript:Traj.Events.updateTimeSliderMode()">
+                    <option value="off">Off</option>
+                    <option value="on" selected="selected">On</option>
+                </select>
+            </form>
+
+            <form>
+                <label for="flip-zSlider">Show Z Slider:</label>
+                <select name="flip-zSlider" id="flip-zSlider" data-role="slider" data-theme="b" data-mini="true" onchange="javascript:Traj.View.updateZSliderMode()">
+                    <option value="off" selected="selected">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+        </div>
+
+        <div id="TopMenu" >
+            <div data-role = "controlgroup" class="left" data-mini="true" data-type="horizontal">
+                <a href="#" onClick="javascript:Traj.Manager.selectPreviousCurve();" data-role="button" data-iconpos="notext" data-inline="true" data-icon="arrow-l">Previous</a>
+                <a id="lbl_current_curve" data-role="button"  data-inline="true" style="background: rgba(255, 255, 255, 0.7);" data-inline="true">0</a>
+                <a href="#" onClick="javascript:Traj.Manager.selectNextCurve();" data-role="button" data-iconpos="notext" data-icon="arrow-r" data-inline="true">Next</a>
+                <a href="#" onClick="javascript:Traj.Manager.deleteCurrentCurve();" data-role="button" data-iconpos="notext" data-icon="delete" data-inline="true">Remove</a>
+                <a href="#" onClick="javascript:Traj.Manager.deleteAllCurves();" data-role="button" data-iconpos="notext" data-icon="refresh" data-inline="true">Refresh</a>
+            </div>
+
+            <div class="top-right">
+                <a href="#settings-panel" data-icon="gear" data-role="button" data-iconpos="right" data-inline="true">Settings</a>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="bg-canvas" class="drawing-canvas"></canvas>
+            <canvas id="traj-canvas" class="drawing-canvas"></canvas>
+            <canvas id="dyn-canvas" class="drawing-canvas"></canvas>
+            <canvas id="current-canvas" class="drawing-canvas"></canvas>
+        </div>
+
+        <div id="sourceSelectDiv">
+            <button class='sourceButton' id='s1' data-role="none">1</button><br/>
+            <button class='sourceButton' id='s2' data-role="none">2</button><br/>
+            <button class='sourceButton' id='s3' data-role="none">3</button><br/>
+            <button class='sourceButton' id='s4' data-role="none">4</button><br/>
+            <button class='sourceButton' id='s5' data-role="none">5</button><br/>
+            <button class='sourceButton' id='s6' data-role="none">6</button><br/>
+            <button class='sourceButton' id='s7' data-role="none">7</button><br/>
+            <button class='sourceButton' id='s8' data-role="none">8</button><br/>
+        </div>
+
+        <div id='drawZone' data-role="none">
+            <div style="margin-top: 40px" unselectable="on" class="unselectable" >Hold to draw a new curve</div>
+        </div>
+
+        <div id='feedbackDisplay' data-role="none">
+            <div style="margin-top: 40px" unselectable="on" class="unselectable" > </div>
+        </div>
+
+        <div class="canvas-left-overlay" id="playDiv">
+            <div data-role="controlgroup" data-type="horizontal" >
+                <a onClick="javascript:Traj.View.setCanvasZoom(0.8);" data-role="button" data-theme="a" data-inline="true" style="background: rgba(250, 250, 250, 0.7);"> - </a>
+                <a onClick="javascript:Traj.View.setCanvasZoom(1.2);" data-role="button" data-theme="a" data-inline="true" style="background: rgba(250, 250, 250, 0.7);"> + </a>
+            </div>
+        
+            <div data-role="controlgroup" data-type="vertical">
+
+                <form>
+                    <label for="flip-loop" style="font-size:small">Loop Mode:</label>
+                    <input type="checkbox" data-role="flipswitch" name="flip-loop" id="flip-loop" data-theme="c"
+                        onchange="javascript:Traj.Player.updateLoopMode();">
+                    <label for="flip-PlayMode" style="font-size:small">MultiPlay:</label>
+                    <input type="checkbox" data-role="flipswitch" name="flip-PlayMode" id="flip-PlayMode" data-theme="d"
+                        onchange="javascript:Traj.Player.updatePlayMode();">
+                </form>
+
+                <div style="height:20px"> </div>
+                 <a id="playButton" data-role="button" data-theme="a" style="background: rgba(250, 250, 250, 0.8); padding: 5px; width:50px; height:30px; line-height: 30px;">Play</a>
+
+            </div>
+        </div>
+
+        <div id="ZSliderDiv" style: "position: absolute, bottom:40">
+            <input type="hidden" class="ZSlider" value="0" />
+        </div>
+
+        <div id="contextMenu">
+            <button id="circularButton" class="contextualButton" >Circular</button>
+            <button id="concatButton" class="contextualButton" >Concat</button>
+        </div>
+
+        <div id="longTouchMenu">
+            <a href="#" onClick="javascript:Traj.Manager.SelectandRedrawEdit(); Traj.Events.hideLongTouchMenu();" data-mini="true" data-role="button" data-icon="edit">Redraw</a>
+            <a href="#" onClick="javascript:Traj.Manager.duplicateCurrentCurve(); Traj.Events.hideLongTouchMenu();" data-mini="true" data-role="button">Duplicate</a>
+            <a href="#" onClick="javascript:Traj.Manager.simplifyCurrentCurve(0.01); Traj.Events.hideLongTouchMenu();" data-mini="true" data-role="button">Simplify (Soft)</a>
+            <a href="#" onClick="javascript:Traj.Manager.simplifyCurrentCurve(0.1); Traj.Events.hideLongTouchMenu();" data-mini="true" data-role="button">Simplify (Hard)</a>
+        </div>
+
+        <div class="canvas-bot-overlay" id="slider-div" style: "position: absolute, bottom:40">
+            <input type="hidden" class="timeSlider" value="0" />
+        </div>
+
+        <div id=footer data-role="footer">
+
+            <div id="sessionDiv">
+                <a id="lblCurrentSession" data-role="button" data-mini="true" data-inline="true" data-inline="true">0</a>
+                <div id="sessionDivOverCanvas">
+                    <a onClick="javascript:Traj.Session.selectPreviousSession();" data-inline="true" data-role="button" data-iconpos="notext" data-icon="arrow-l"> Previous </a>
+                    <a onClick="javascript:Traj.Session.selectNextSession();" data-inline="true" data-role="button" data-iconpos="notext" data-icon="arrow-r"> Next </a>
+                    <a onClick="javascript:Traj.Session.newSession();" data-inline="true" data-role="button" data-icon="plus" data-iconpos="notext"> New </a>
+                    <a onClick="javascript:Traj.Session.deleteSelectedSession();" data-inline="true"  data-role="button" data-icon="delete" data-iconpos="notext">Delete</a>
+                </div>
+            </div>
+
+              <div class="center" id="orientation">
+                <input type="button" value="On" id="onoff" onclick="onoff();">
+            </div>
+
+            <div class="right" id="options-div">
+                <a href="#" onClick="javascript:Traj.Events.OrientationRecording();" data-inline="true" data-mini="true" data-role="button" id="OrientationButton" data-theme='c'>Set Orientation</a>
+                <a href="#" onClick="javascript:Traj.Session.exportCurrentCurve();" data-inline="true" data-mini="true" data-role="button">Send</a>
+            </div>
+        </div>
+        <!-- /footer -->
+    </div>
+    <!-- /page -->
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //Traj.Session.clearTrajSessions();
+            Traj.initialize();
+            $.mobile.loading().hide();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "Traj",
+  "author": "Jérémie Garcia <jeremie.garcia@enac.fr>",
+  "description": "Trajectoires OSC Bridge Server",
+  "main": "index.html",
+  "version": "1.0.0",
+  "license": "MIT",
+  "window": {
+    "title": "Traj",
+    "show": true,
+    "toolbar": false,
+    "icon": "/icon-design/traj-icon.png",
+    "frame": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://gitlab.doc.gold.ac.uk/jgarc012/Trajectoires.git"
+  },
+  "dependencies": {
+    "connect": "2.29.1",
+    "omgosc": "1.0.0",
+    "qr-image": "^3.1.0",
+    "ws": "0.7.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-util": "3.0.4",
+    "nw-builder": "^2.0.2"
+  }
+}

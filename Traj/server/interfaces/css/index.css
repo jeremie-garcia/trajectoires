@@ -1,0 +1,306 @@
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    margin: 0%;
+    -webkit-touch-callout: none;
+    /* prevent callout to copy image, etc when tap to hold */
+    
+    -webkit-text-size-adjust: none;
+    /* prevent webkit from resizing text to fit */
+    
+    -webkit-user-select: none;
+    /* prevent copy paste, to allow, change 'none' to 'text' */
+    
+    background-color: #FFFFFF;
+    font-size: 12px;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+.unselectable{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+.vertical-spacer {
+    height: 20px;
+    line-height: 0;
+}
+/* CANVAS CSS */
+
+.canvas-container {
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.drawing-canvas {
+    position: absolute;
+}
+
+#dyn-canvas {
+    z-index: 2;
+    background: transparent;
+}
+
+#traj-canvas {
+    z-index: 1;
+    background: transparent;
+}
+
+#bg-canvas {
+    z-index: 0;
+    border: solid black 1px;
+}
+
+.canvas-right-overlay {
+    position: absolute;
+    top: 20%;
+    right: 0;
+    vertical-align: center;
+    z-index: 3;
+}
+
+.canvas-left-overlay {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    vertical-align: center;
+    z-index: 3;
+}
+
+.canvas-bot-overlay {
+    position: fixed;
+    bottom: 60px;
+    width: device-width;
+    height: 30px;
+    left: 100px;
+    vertical-align: center;
+    z-index: 3;
+    opacity: 0.7;
+}
+
+.sourceButton{
+    margin : -3px;
+    padding: 0;
+    background-color: green;
+    border-radius: 50%;
+    border: 5px solid transparent;
+    width: 35px;
+    height: 35px;
+    opacity: 0.8;
+    font-size: 130%;
+    display: block;
+}
+
+#sourceSelectDiv {
+    position : absolute;
+    top : 60px;
+    right: 10px;
+    z-index : 4;
+}
+
+.ui-checkbox input, .ui-radio input {
+    width: 20px;
+    height: 20px;
+    margin: 10px;
+}
+/*#timeValue {
+    position: absolute;
+    width: 40px;
+    bottom : 20px;
+}*/
+
+#ZSliderDiv {
+    position:absolute;
+    top:110px;
+    left: 60px;
+    width: 50px;
+    z-index: 4;
+    -webkit-transform:rotate(90deg);
+    opacity: 0.7;
+}
+
+.transparent {
+    background-color: rgb(0, 0, 0);
+    /* RGBa with 0.6 opacity */
+    
+    background-color: rgba(255, 255, 255, 0.6);
+    background: transparent;
+}
+
+#footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height:40px;
+}
+
+.right {
+    position: absolute;
+    right: 0px;
+    bottom: 0;
+    margin: 0px;
+}
+
+.top-right {
+    position: absolute;
+    right: 0;
+    opacity: 0.8;
+    z-index: 5;
+}
+
+.left {
+    position: absolute;
+    left: 0;
+    z-index: 5;
+    margin: 0px;
+}
+
+a.curveMenuButton {
+    margin: 0px;
+    padding: 0px;
+    padding-bottom: 15px;
+    padding-top: 10px;
+    color : black !important;
+    border-color: black;
+    border-style: solid;
+    border-width: 2px;
+    text-align: center;
+}
+
+.content {
+    margin: 0px;
+    padding: 0px;
+    border-width: 2px;
+    padding-right: 5px!important;
+    padding-left: 20px!important;
+    color: black!important;
+    font: 13px Arial; 
+}
+
+.curveMenuButton:first-child {
+    border-left: 1px solid #666666;
+}
+
+#spaceStretchDiv {
+    display: inline;
+}
+#spaceStretchDiv > input {
+    width: 50px;
+}
+
+#positionDiv {
+    display: inline;
+}
+#positionDiv > input {
+    width: 50px;
+}
+
+#sessionDiv {
+    left: 0px; 
+    z-index: 4;
+}
+
+#sessionDivOverCanvas {
+  position: absolute;
+  left: 0;
+  bottom: 40px;
+  width:200px;
+  z-index: 4;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+#longTouchMenu {
+  position: absolute;
+  z-index: 3;
+  width : 130px;
+  top : 20%;
+  right: 20%
+}
+
+#header > a {
+    height: 16px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+#spaceStretchDiv > input {
+    width: 50px;
+
+}
+
+.miniButton{
+    width: 15px;
+    height: 15px;
+    margin: 15px;
+    padding: 15px;
+
+}
+
+.miniButtonText {
+    padding: 0px;
+    padding-top: 15px;
+    width: 45px;
+    height: 30px;
+    font-size:10px;
+}
+
+#drawZone {
+    position: absolute;
+    background-color: rgba(50,250,50,0.4);
+    bottom:45px;
+    left:0px;
+    width:80px;
+    height: 180px;
+    z-index: 4;
+    font-size: 18px;
+    text-align: center;
+}
+
+#feedbackDisplay {
+    position: absolute;
+    background-color: rgba(250,250,250,0.6);
+    top:50px;
+    left:5px;
+    width:120px;
+    height: 20px;
+    z-index: 4;
+    font-size: 20px;
+    text-align: left;
+}
+
+#contextMenu{
+    position:absolute;
+    height: 30px;
+    width:100 px;
+}
+
+.contextualButton{
+    background-color: white;
+    border-radius: 50%;
+    border: 3px solid black;
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+.circularButton {
+    z-index: 5!important;
+}
+
+label {
+    margin-bottom: 0px !important;
+}
