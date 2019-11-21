@@ -1,5 +1,5 @@
 if (typeof require !== 'undefined') {
-  var fs            = require('fs'),
+  var fs        = require('fs'),
   ws            = require('ws'),
   url           = require('url'),
   net           = require('net'),
@@ -9,13 +9,13 @@ if (typeof require !== 'undefined') {
   os            = require('os'),
   qr            = require('qr-image'),
   //midi            = require('midi'),
+  pathModule          = require('path'),
   fetchingInterface =  null;
 }
 
-
 if(typeof global.interface === 'undefined') { // only run if not reloading...  
   var OSC_ADMIN_PORT = 10000, WEBSOCKET_ADMIN_PORT = 10001, ids = [];
-  
+
   global.interface = {
     count: 0,
     servers: [],
@@ -24,109 +24,108 @@ if(typeof global.interface === 'undefined') { // only run if not reloading...
     highlightedServerRow : null,
     oscAdminIn : new omgosc.UdpReceiver( OSC_ADMIN_PORT ),
     websocketAdminIn : new ws.Server({ port:WEBSOCKET_ADMIN_PORT }),
-    
+
     extend : function(destination, source) {
       for (var property in source) {
         var keys = property.split(".");
+        
+        // don't copy large array buffers
+        if(source[property] instanceof Array && source[property].length < 100) { 
+          destination[property] = source[property].slice(0);
+        } else {
+          destination[property] = source[property];
+        }
+      }
+      return destination;
+    },
 
-    		if(source[property] instanceof Array && source[property].length < 100) { // don't copy large array buffers
-         destination[property] = source[property].slice(0);
-     } else {
-      destination[property] = source[property];
-    }
-  }
-  return destination;
-},
+    serverRow : function( server ) {
+      var folderchooser =  $('<input type="file" nwdirectory />').css({ textAlign:'left' });
 
-serverRow : function( server ) {
-  var folderchooser =  $('<input type="file" nwdirectory />').css({ textAlign:'left' });
+      var infoTable = $( '<table>' )
+      .css({ border:'none' })
+      .addClass('infoTable')
+      .append( $("<tr>").append( $("<td>").text('Name'), $("<td>").text( server.name ) ) ) 
+      .append( $("<tr>").append( $("<td>").text('Save Directory'), $("<td>").text( server.savedirectory))) 
+      .append( $("<tr>").append( $("<td>").text('Web Server Port'), $("<td>").text( server.webServerPort ) ) )
+      .append( $("<tr>").append( $("<td>").text('Web Socket Port'), $("<td>").text( server.webSocketPort ) ) ) 
+      .append( $("<tr>").append( $("<td>").text('Output Message Format'), $("<td>").text( server.outputType ) ) ); 
 
-  var infoTable = $( '<table>' )
-  .css({ border:'none' })
-  .addClass('infoTable')
-  .append( $("<tr>").append( $("<td>").text('Name'), $("<td>").text( server.name ) ) ) 
-  .append( $("<tr>").append( $("<td>").text('Save Directory'), $("<td>").text( server.savedirectory))) 
-  .append( $("<tr>").append( $("<td>").text('Web Server Port'), $("<td>").text( server.webServerPort ) ) )
-  .append( $("<tr>").append( $("<td>").text('Web Socket Port'), $("<td>").text( server.webSocketPort ) ) ) 
-  .append( $("<tr>").append( $("<td>").text('Output Message Format'), $("<td>").text( server.outputType ) ) ); 
-
-  var srv;
-  console.log( server.outputType )
-  if( server.outputType === 'OSC' ) {
-    _srv = global.interface.makeServer( server );  
-    infoTable.append( $("<tr>").append( $("<td>").text('OSC Input Port'), $("<td>").text( server.oscInputPort ) ) );
-    infoTable.append( $("<tr>").append( $("<td>").text('OSC Output Port'), $("<td>").text( server.oscOutputPort ) ) );
-    infoTable.append( $("<tr>").append( $("<td>").text('OSC Output IP Address'), $("<td>").text( server.oscOutputIP ) ) );                   
-  }else if( server.outputType === 'WebSocket' ) {
+      var srv;
+      if( server.outputType === 'OSC' ) {
+        _srv = global.interface.makeServer( server );  
+        infoTable.append( $("<tr>").append( $("<td>").text('OSC Input Port'), $("<td>").text( server.oscInputPort ) ) );
+        infoTable.append( $("<tr>").append( $("<td>").text('OSC Output Port'), $("<td>").text( server.oscOutputPort ) ) );
+        infoTable.append( $("<tr>").append( $("<td>").text('OSC Output IP Address'), $("<td>").text( server.oscOutputIP ) ) );                   
+      }else if( server.outputType === 'WebSocket' ) {
         //server.webSocketMasterPort = 8003
         //server.webSocketPort = 8001
         //_srv = global.interface.makeServer( server );  
         infoTable.append( $("<tr>").append( $("<td>").text('WebSocket Output Port'), $("<td>").text( server.webSocketMasterPort ) ) );
+    }
+    var row = $("<tr>")
+    .append( $("<td>").append( infoTable ) )
+    .append( $("<td>").append( $("<input type='checkbox'>").change( function() { _srv.shouldAppendID = $(this).is(':checked'); }) ) )
+    .append( $("<td>").append( $("<input type='checkbox'>").change( function() { _srv.shouldMonitor  = $(this).is(':checked'); }) ) )
+    .on('mousedown', function() {
+      if(global.interface.highlightServerRow !== null) {
+        $(global.interface.highlightServerRow).removeClass('highlightedRow');
       }
-      var row = $("<tr>")
-      .append( $("<td>").append( infoTable ) )
-      .append( $("<td>").append( $("<input type='checkbox'>").change( function() { _srv.shouldAppendID = $(this).is(':checked'); }) ) )
-      .append( $("<td>").append( $("<input type='checkbox'>").change( function() { _srv.shouldMonitor  = $(this).is(':checked'); }) ) )
-      .on('mousedown', function() {
-        if(global.interface.highlightServerRow !== null) {
-          $(global.interface.highlightServerRow).removeClass('highlightedRow');
-        }
-        $(this).addClass('highlightedRow');
-        global.interface.highlightServerRow = row;
-      });
+      $(this).addClass('highlightedRow');
+      global.interface.highlightServerRow = row;
+    });
 
       //row.server = _srv;
       
       $("#serverTableBody").append(row);
-    },
-    appendLivecodeRow : function() {
-      var row = $('<tr>')
-      .append( $('<td colspan=3>').html( '<b>livecode server is now running.</b>' ).css('font-size', '1em') ) 
-      
-      $('#serverTableBody').append( row )            
-    }, 
-    openFile : function() { 
-      $("#fileButton").trigger('click');
-      
-      $("#fileButton").change(function() {
-        var json = fs.readFileSync( $( this ).val(), [ 'utf-8' ] ), 
-        servers = JSON.parse( json );
+  },
+  appendLivecodeRow : function() {
+    var row = $('<tr>')
+    .append( $('<td colspan=3>').html( '<b>livecode server is now running.</b>' ).css('font-size', '1em') ) 
 
-        for(var i = 0; i < servers.length; i++) {
-          global.interface.serverRow( servers[i] );
+    $('#serverTableBody').append( row )            
+  }, 
+  openFile : function() { 
+    $("#fileButton").trigger('click');
+
+    $("#fileButton").change(function() {
+      var json = fs.readFileSync( $( this ).val(), [ 'utf-8' ] ), 
+      servers = JSON.parse( json );
+
+      for(var i = 0; i < servers.length; i++) {
+        global.interface.serverRow( servers[i] );
+      }
+    })
+  },
+
+  propsToSave : ['webServerPort', 'outputType', 'webSocketPort', 
+  'oscInputPort', 'oscOutputPort', 'oscOutputIP', 
+  'shouldMonitor', 'shouldAppendID', 'directory', 'savedirectory', 'name'],
+
+  saveFile : function() { 
+    $("#saveFileButton").trigger('click');
+    $("#saveFileButton").change(function() {
+      var json = [];
+
+      var serverRows = $("#serverTableBody tr");
+      for(var i = 0; i < global.interface.servers.length; i++) {
+        var _server = global.interface.servers[i],
+        server = {};
+
+        for(var j = 0; j < global.interface.propsToSave.length; j++) {
+          var prop = global.interface.propsToSave[j];
+          if( prop in _server ) server[ prop ] = _server[ prop ];
         }
-      })
-    },
-    
-    propsToSave : ['webServerPort', 'outputType', 'webSocketPort', 
-    'oscInputPort', 'oscOutputPort', 'oscOutputIP', 
-    'shouldMonitor', 'shouldAppendID', 'directory', 'savedirectory', 'name'],
-    
-    saveFile : function() { 
-      $("#saveFileButton").trigger('click');
-      $("#saveFileButton").change(function() {
-        var json = [];
-        
-        var serverRows = $("#serverTableBody tr");
-        ////console.log(serverRows);
-        for(var i = 0; i < global.interface.servers.length; i++) {
-          var _server = global.interface.servers[i],
-          server = {};
-          
-          for(var j = 0; j < global.interface.propsToSave.length; j++) {
-            var prop = global.interface.propsToSave[j];
-            if( prop in _server ) server[ prop ] = _server[ prop ];
-          }
-          json.push(server);
-        }
-        fs.writeFileSync($(this).val(), JSON.stringify( json ), ['utf-8']);
-      })
-    },
-    
-    removeServer : function(server) {
-      if(server) {
-        if(server.oscInput !== null) { server.oscInput.close(); }
-        if(server.webSocket !== null) { server.webSocket.close(); }
+        json.push(server);
+      }
+      fs.writeFileSync($(this).val(), JSON.stringify( json ), ['utf-8']);
+    })
+  },
+
+  removeServer : function(server) {
+    if(server) {
+      if(server.oscInput !== null) { server.oscInput.close(); }
+      if(server.webSocket !== null) { server.webSocket.close(); }
         if(server.webServer !== null) { server.webServer.close(); } //console.log("WEB SERVER SHOULD BE CLOSED DAMN IT")); }
 
   this.portsInUse.splice( this.portsInUse.indexOf( server.webServerPort ), 1 );
@@ -150,104 +149,104 @@ removeAllServers : function() {
         this.removeServer( server );
       }
       this.servers.length = 0;
-    },
-    
-    init : function() {
-      var serverCount = 1,
-      _srv = null,
-      servers = {};
-      win = require('nw.gui').Window.get();
-      win.show();
+  },
 
-      $( '#deleteButton' )
-      .button({ icons:{ primary:'ui-icon-close'} })
-      .click(function() {
-        if( global.interface.highlightServerRow !== null ) {
-          global.interface.removeServer( global.interface.highlightServerRow.server );
-          $( global.interface.highlightServerRow ).remove();
-          global.interface.highlightServerRow = null;
+  init : function() {
+    var serverCount = 1,
+    _srv = null,
+    servers = {};
+    win = require('nw.gui').Window.get();
+    win.show();
+
+    $( '#deleteButton' )
+    .button({ icons:{ primary:'ui-icon-close'} })
+    .click(function() {
+      if( global.interface.highlightServerRow !== null ) {
+        global.interface.removeServer( global.interface.highlightServerRow.server );
+        $( global.interface.highlightServerRow ).remove();
+        global.interface.highlightServerRow = null;
+      }
+    });
+
+    $( "#clearMonitorButton" )
+    .button({icons:{ primary:'ui-icon-close' } })
+    .click( function() { 
+      $("#monitorTableBody").empty();
+      rowCount = 0;
+    });   
+
+    (function($){
+      $.fn.extend({
+        center: function () {
+          return this.each(function() {
+            var top = ($(window).height() - $(this).outerHeight()) / 2;
+            var left = ($(window).width() - $(this).outerWidth()) / 2;
+            $(this).css({position:'absolute', margin:0, top: '100px', left: (left > 0 ? left : 0)+'px'});
+          });
         }
+      }); 
+    })(jQuery);
+
+    $("#newButton").button({icons:{ primary:'ui-icon-document' } })
+    .click(function() {
+      var t = $("<table id='newServerTable'>").css({ border:'1px solid #ccc'}),
+      nameRow = $("<tr>"),
+      name = $('<input type="text" value="Server' + serverCount++ + '" />'),
+      nameLabel = $("<td width=150>Server Name</td>").css({ textAlign:'right', paddingRight:'15px' }),
+      directoryRow = $("<tr>"),
+      directory = $('<input type="file" nwdirectory />').css({ textAlign:'left' }),
+      directoryLabel = $("<td>Server Directory</td>").css({ textAlign:'right', paddingRight:'15px' }),
+      webServerRow = $("<tr>"),
+      webServerPort = $('<input type="text" value="8080" />'),
+      webServerLabel = $("<td>Web Server Port</td>").css({ textAlign:'right', paddingRight:'15px' }),
+      webSocketRow = $("<tr>"),
+      webSocketPort = $('<input type="text" value="8081" />'),
+      webSocketMasterPort = $('<input type="text" value="8081" />')
+      webSocketLabel = $("<td>Web Socket Port</td>").css({ textAlign:'right', paddingRight:'15px' }),
+      outputTypeRow = $("<tr>"),
+      outputType = $('<select><option>Select an option</option><option>OSC</option><option>WebSocket</option><option>MIDI</option></select>'),
+      outputTypeLabel = $("<td>Output Message Format</td>").css({ textAlign:'right', paddingRight:'15px' });
+
+      directory.change( function() {
+        if( outputType.val() != 'Select an option') {
+          $( "#submitButton" ).attr( 'disabled', false );
+        }
+      })
+
+      outputType.change( function() {
+        if($(this).val() === 'OSC') {
+          oscOutputPortRow = $("<tr>"),
+          oscOutputPort =  $('<input type="text" value="8082" />'),
+          oscOutputPortLabel = $("<td>OSC Output Port</td>").css({ textAlign:'right', paddingRight:'15px' });
+          oscOutputPortRow.append( oscOutputPortLabel, $("<td>").append( oscOutputPort ).css({ textAlign:'left' }) );
+
+          t.append( oscOutputPortRow );
+
+          oscOutputIPRow = $("<tr>"),
+          oscOutputIP =  $('<input type="text" value="127.0.0.1" />'),
+          oscOutputIPLabel = $("<td>OSC Output IP Address</td>").css({ textAlign:'right', paddingRight:'15px' });
+          oscOutputIPRow.append( oscOutputIPLabel, $("<td>").append( oscOutputIP ).css({ textAlign:'left' }) );
+
+          t.append( oscOutputIPRow );
+
+          oscInputPortRow = $("<tr>"),
+          oscInputPort =  $('<input type="text" value="8083" />'),
+          oscInputPortLabel = $("<td>OSC Input Port</td>").css({ textAlign:'right', paddingRight:'15px' });
+          oscInputPortRow.append( oscInputPortLabel, $("<td>").append( oscInputPort ).css({ textAlign:'left' }) );
+
+          t.append( oscInputPortRow );
+        }else if( $(this).val() === 'WebSocket' ) {
+          webSocketMasterPortRow = $("<tr>"),
+          webSocketMasterPort =  $('<input type="text" value="8082" />'),
+          webSocketMasterPortLabel = $("<td>WebSocket Output Port</td>").css({ textAlign:'right', paddingRight:'15px' });
+          webSocketMasterPortRow.append( webSocketMasterPortLabel, $("<td>").append( webSocketMasterPort ).css({ textAlign:'left' }) );
+
+          t.append( webSocketMasterPortRow );      
+        }
+
+        if(directory.val() != '')
+          $( "#submitButton" ).attr( 'disabled', false );
       });
-
-      $( "#clearMonitorButton" )
-      .button({icons:{ primary:'ui-icon-close' } })
-      .click( function() { 
-        $("#monitorTableBody").empty();
-        rowCount = 0;
-      });   
-
-      (function($){
-        $.fn.extend({
-          center: function () {
-            return this.each(function() {
-              var top = ($(window).height() - $(this).outerHeight()) / 2;
-              var left = ($(window).width() - $(this).outerWidth()) / 2;
-              $(this).css({position:'absolute', margin:0, top: '100px', left: (left > 0 ? left : 0)+'px'});
-            });
-          }
-        }); 
-      })(jQuery);
-
-      $("#newButton").button({icons:{ primary:'ui-icon-document' } })
-      .click(function() {
-        var t = $("<table id='newServerTable'>").css({ border:'1px solid #ccc'}),
-        nameRow = $("<tr>"),
-        name = $('<input type="text" value="Server' + serverCount++ + '" />'),
-        nameLabel = $("<td width=150>Server Name</td>").css({ textAlign:'right', paddingRight:'15px' }),
-        directoryRow = $("<tr>"),
-        directory = $('<input type="file" nwdirectory />').css({ textAlign:'left' }),
-        directoryLabel = $("<td>Server Directory</td>").css({ textAlign:'right', paddingRight:'15px' }),
-        webServerRow = $("<tr>"),
-        webServerPort = $('<input type="text" value="8080" />'),
-        webServerLabel = $("<td>Web Server Port</td>").css({ textAlign:'right', paddingRight:'15px' }),
-        webSocketRow = $("<tr>"),
-        webSocketPort = $('<input type="text" value="8081" />'),
-        webSocketMasterPort = $('<input type="text" value="8081" />')
-        webSocketLabel = $("<td>Web Socket Port</td>").css({ textAlign:'right', paddingRight:'15px' }),
-        outputTypeRow = $("<tr>"),
-        outputType = $('<select><option>Select an option</option><option>OSC</option><option>WebSocket</option><option>MIDI</option></select>'),
-        outputTypeLabel = $("<td>Output Message Format</td>").css({ textAlign:'right', paddingRight:'15px' });
-
-        directory.change( function() {
-          if( outputType.val() != 'Select an option') {
-            $( "#submitButton" ).attr( 'disabled', false );
-          }
-        })
-
-        outputType.change( function() {
-          if($(this).val() === 'OSC') {
-            oscOutputPortRow = $("<tr>"),
-            oscOutputPort =  $('<input type="text" value="8082" />'),
-            oscOutputPortLabel = $("<td>OSC Output Port</td>").css({ textAlign:'right', paddingRight:'15px' });
-            oscOutputPortRow.append( oscOutputPortLabel, $("<td>").append( oscOutputPort ).css({ textAlign:'left' }) );
-
-            t.append( oscOutputPortRow );
-
-            oscOutputIPRow = $("<tr>"),
-            oscOutputIP =  $('<input type="text" value="127.0.0.1" />'),
-            oscOutputIPLabel = $("<td>OSC Output IP Address</td>").css({ textAlign:'right', paddingRight:'15px' });
-            oscOutputIPRow.append( oscOutputIPLabel, $("<td>").append( oscOutputIP ).css({ textAlign:'left' }) );
-
-            t.append( oscOutputIPRow );
-
-            oscInputPortRow = $("<tr>"),
-            oscInputPort =  $('<input type="text" value="8083" />'),
-            oscInputPortLabel = $("<td>OSC Input Port</td>").css({ textAlign:'right', paddingRight:'15px' });
-            oscInputPortRow.append( oscInputPortLabel, $("<td>").append( oscInputPort ).css({ textAlign:'left' }) );
-
-            t.append( oscInputPortRow );
-          }else if( $(this).val() === 'WebSocket' ) {
-            webSocketMasterPortRow = $("<tr>"),
-            webSocketMasterPort =  $('<input type="text" value="8082" />'),
-            webSocketMasterPortLabel = $("<td>WebSocket Output Port</td>").css({ textAlign:'right', paddingRight:'15px' });
-            webSocketMasterPortRow.append( webSocketMasterPortLabel, $("<td>").append( webSocketMasterPort ).css({ textAlign:'left' }) );
-
-            t.append( webSocketMasterPortRow );      
-          }
-
-          if(directory.val() != '')
-            $( "#submitButton" ).attr( 'disabled', false );
-        });
 
   nameRow.append(nameLabel, $("<td>").append( name ).css({ textAlign:'left' }) );
   directoryRow.append(directoryLabel, $("<td>").append( directory ).css({ textAlign:'left' }) );
@@ -375,7 +374,7 @@ removeAllServers : function() {
       $("#monitorTableBody").prepend( row );
       if(rowCount++ > 20) $("#monitorTableBody tr").last().remove();        
     },
-    
+
     addClient : function(client, id, ip, serverName, interfaceName) {
       var row = $("<tr>")
       .append( $("<td>").text( id ) )
@@ -392,7 +391,7 @@ removeAllServers : function() {
         }
         )
       ));
-      
+
       Object.defineProperty(client, 'interfaceName', {
         get : function() { return interfaceName; },
         set : function(_v) { 
@@ -401,7 +400,7 @@ removeAllServers : function() {
         }
       })
       $("#clientsTableBody").append( row );
-      
+
       return row;
     },
   };  
@@ -474,142 +473,135 @@ handleMsgFromClients : function( server, address, args, socket) {
               server.master.send( JSON.stringify(args) );
             }else{
             }
-          }
         }
-      }else if( args.type === 'midi' ) {
-        if(args.midiType !== 'programchange') {
-          midiOutput.sendMessage([ midiNumbers[ args.midiType ] + args.channel, args.number, Math.round(args.value) ])
-          if( server.shouldMonitor || socket.shouldMonitor ) {
-            _monitor.postMessage(server.name, socket.id, args.midiType, args.channel, args.number + " : " + Math.round(args.value)  );
-          }
-        }else{
-          midiOutput.sendMessage([ 0xC0 + args.channel, args.number ])
-          if( server.shouldMonitor || socket.shouldMonitor ) {
-            _monitor.postMessage(server.name, socket.id, args.midiType, args.channel, args.number  );
-          }
-        }
+    }
+}else if( args.type === 'midi' ) {
+  if(args.midiType !== 'programchange') {
+    midiOutput.sendMessage([ midiNumbers[ args.midiType ] + args.channel, args.number, Math.round(args.value) ])
+    if( server.shouldMonitor || socket.shouldMonitor ) {
+      _monitor.postMessage(server.name, socket.id, args.midiType, args.channel, args.number + " : " + Math.round(args.value)  );
+    }
+  }else{
+    midiOutput.sendMessage([ 0xC0 + args.channel, args.number ])
+    if( server.shouldMonitor || socket.shouldMonitor ) {
+      _monitor.postMessage(server.name, socket.id, args.midiType, args.channel, args.number  );
+    }
+  }
+}
+},
+getClientById : function( server, id ) {
+  for( var key in server.clients ) {
+    var client = server.clients[ key ]
+    if( client.id === id ) { 
+      return client
+    }
+  }
+  console.log(" RETURNING NULL ")
+  return null
+},
+assignSocketID : function( server, socket ) {
+  if( typeof server.clients[ socket.ip ] !== 'undefined' ) {
+    socket.id = server.clients[ socket.ip ].id
+    server.clients[ socket.ip ] = socket
+  }else{
+    server.clients[ socket.ip ] = socket
+    socket.id = server.clientCount++
+  }
+  },
+  clientClose : function( server, socket ) {
+    if(server.outputType === 'OSC')  {
+      server.oscOutput.send( '/deviceDisconnected', 'i', [ socket.id ] );
+    }else if( server.outputType === 'WebSocket' ) {
+      if( server.master !== null) {
+        var msg = JSON.stringify({ type:'osc', address:'/deviceDisconnected', typetags:'i', parameters:[ socket.id ] })
+        server.master.send( msg ) 
       }
-    },
-    getClientById : function( server, id ) {
-      for( var key in server.clients ) {
-        var client = server.clients[ key ]
-        if( client.id === id ) { 
-          return client
-        }
-      }
-      console.log(" RETURNING NULL ")
-      return null
-    },
-    assignSocketID : function( server, socket ) {
-      if( typeof server.clients[ socket.ip ] !== 'undefined' ) {
-        socket.id = server.clients[ socket.ip ].id
-        server.clients[ socket.ip ] = socket
-      }else{
-        server.clients[ socket.ip ] = socket
-        socket.id = server.clientCount++
-      }
-      // for(var i = 0; i < server.clients.length; i++) {
-      //   if(typeof server.clients[i] !== 'undefined') {
-      //     if(server.clients[i].ip === socket.ip) {
-      //       found = true;
-      //       socket.id = server.clients[i].id;
-      //       break;
-      //     }
-      //   }
-      // }
-      
-      // if(!found) {
-      //   var id;
-      //   for(var i = 0; i <= server.clients.length; i++) {
-      //     if(typeof server.clients[i] === 'undefined') {
-      //       id = i;
-      //       break;
-      //     }
-      //   }
-      //   socket.id = id;
-      //   server.clients.push( socket );
-      // }
-    },
-    clientClose : function( server, socket ) {
-      if(server.outputType === 'OSC')  {
-        server.oscOutput.send( '/deviceDisconnected', 'i', [ socket.id ] );
-      }else if( server.outputType === 'WebSocket' ) {
-        if( server.master !== null) {
-          var msg = JSON.stringify({ type:'osc', address:'/deviceDisconnected', typetags:'i', parameters:[ socket.id ] })
-          server.master.send( msg ) 
-        }
-      }
-      
-      // for( var i = server.clients.length - 1; i >= 0; i++) {
-      //   if( server.clients[ i ].id === socket.id ) {
-      //     server.clients.splice( i, 1 )
-      //     break;
-      //   }
-      // }
-      // elete server.clients[ socket.id ];
+    }
+
+    if( typeof server.clients[ socket.ip ] !== 'undefined' ) {
+    delete server.clients[socket.ip];
+    server.clientCount--;
+  }
       $(socket.row).remove();
-    },
-    sendClientConnectionNotification : function( server, id ) {
+        global.interface.notifyClientsInIdUpdates(server,socket.id);
+  },
+  sendClientConnectionNotification : function( server, id ) {
       if(server.outputType === 'OSC') {
-        server.oscOutput.send( '/deviceConnected', 'i', [ id ] );
-      }else if( server.outputType === 'WebSocket' ) {
-        if( server.master !== null ) {
-          var msg = JSON.stringify({ type:'osc', address:'/deviceConnected', typetags:'i', parameters:[ id ] })
+      
+      //send a message to the clients so that they know their ID as well (for collaborative cases)
+      global.interface.notifyClientsInIdUpdates(server,id);
+            
+      server.oscOutput.send( '/deviceConnected', 'i', [ id ] );
 
-          server.master.send( msg ) 
-        }
+    }else if( server.outputType === 'WebSocket' ) {
+      if( server.master !== null ) {
+        var msg = JSON.stringify({ type:'osc', address:'/deviceConnected', typetags:'i', parameters:[ id ] })
+        server.master.send( msg ) 
       }
+    }
+  },
+    notifyClientsInIdUpdates : function(server,id){
+      var client, counter = 0, length = server.clientCount;
+      for(var key in server.clients) {
+              client = server.clients[key];
+              if(client !== null){
+                var msg = { type:'osc', address:'/id', typetags:'ii', parameters:[ counter, length ]};
+                client.send( JSON.stringify(msg));
+                counter++;
+              }
+            }
+  },
+
+  createWebSocketListener : function( server ) {
+    server.webSocket.on( 'connection', function (socket) {
+      var found = false;
+
+      socket.shouldMonitor = false;
+      socket.ip = socket._socket.remoteAddress;
+      socket.interfaceName = fetchingInterface;
+
+      global.interface.assignSocketID( server, socket );
+
+      socket.on( 'message', function( obj ) {
+        var args = JSON.parse( obj );
+        global.interface.handleMsgFromClients( server, args.address, args, socket )
+      })
+
+      socket.on('close', function() { global.interface.clientClose( server, socket ); } )
+
+      global.interface.sendClientConnectionNotification( server, socket.id );
+
+      socket.row = _monitor.addClient(socket, socket.id, socket.ip, server.name, socket.interfaceName); 
+    });
+  },
+  makeServer : function( serverProps ) {
+    var clients           = {},
+    serverID          = global.interface.servers.length,
+    root              = serverProps.directory,
+    midiInit          = false,
+    interfaceJS       = null,
+    webserver         = null,
+    serveInterfaceJS  = null,
+    midiOut           = null,
+    midiNumbers       = {
+      "noteon"        : 0x90,
+      "noteoff"       : 0x80,
+      "cc"            : 0xB0,
+      "programchange" : 0xC0,
     },
-    createWebSocketListener : function( server ) {
-      server.webSocket.on( 'connection', function (socket) {
-        var found = false;
+    server            = {
+      shouldAppendID: false,
+      shouldMonitor : false,
+      clients       : clients,
+      masterSocket  : null,
+      livecode      : false,
+      clientCount   : 0,
+      serveInterfaceJS : function(req, res, next){
+        req.uri = url.parse( req.url );
+        //console.log("Requested file from server: " + req.uri.pathname);
+        var extension = req.uri.pathname.split('.').pop();
 
-        socket.shouldMonitor = false;
-        socket.ip = socket._socket.remoteAddress;
-        socket.interfaceName = fetchingInterface;
-        
-        global.interface.assignSocketID( server, socket );
-
-        socket.on( 'message', function( obj ) {
-          var args = JSON.parse( obj );
-          global.interface.handleMsgFromClients( server, args.address, args, socket )
-        })
-
-        socket.on('close', function() { global.interface.clientClose( server, socket ); } )
-        
-        global.interface.sendClientConnectionNotification( server, socket.id );
-
-        socket.row = _monitor.addClient(socket, socket.id, socket.ip, server.name, socket.interfaceName); 
-      });
-    },
-    makeServer : function( serverProps ) {
-      var clients           = {},
-      serverID          = global.interface.servers.length,
-      root              = serverProps.directory,
-      midiInit          = false,
-      interfaceJS       = null,
-      webserver         = null,
-      serveInterfaceJS  = null,
-      midiOut           = null,
-      midiNumbers       = {
-        "noteon"        : 0x90,
-        "noteoff"       : 0x80,
-        "cc"            : 0xB0,
-        "programchange" : 0xC0,
-      },
-      server            = {
-        shouldAppendID: false,
-        shouldMonitor : false,
-        clients       : clients,
-        masterSocket  : null,
-        livecode      : false,
-        clientCount   : 0,
-        serveInterfaceJS : function(req, res, next){
-         req.uri = url.parse( req.url );
-
-         var extension = req.uri.pathname.split('.').pop();
-
-         if(extension == 'htm' || extension =="html") {
+        if(extension == 'htm' || extension =="html") {
           fetchingInterface = req.uri.pathname.slice(1);
         }
 
@@ -617,9 +609,9 @@ handleMsgFromClients : function( server, address, args, socket) {
 
         if( req.uri.pathname === "/interface.js" ) {
           res.writeHead( 200, {
-           'Content-Type': 'text/javascript',
-           'Content-Length': js.length
-         })
+            'Content-Type': 'text/javascript',
+            'Content-Length': js.length
+          })
           res.end( js );
 
           return;
@@ -653,64 +645,66 @@ handleMsgFromClients : function( server, address, args, socket) {
           // don't open a new port if the admin port is the same as the desired input port
           server.oscInput = server.oscInputPort === OSC_ADMIN_PORT ?  global.interface.oscAdminIn : new omgosc.UdpReceiver( server.oscInputPort )
           global.interface.portsInUse.push( server.oscInputPort ); 
-        }else{
-          alert('there is already a service runnning on port ' + server.oscInputPort + '. please choose another port for osc input.');
-          return;
-        }        
       }else{
-        if( !midiInit ) {
-          midiOutput = new midi.output();
-          midiOutput.openVirtualPort( "Interface.Server Output" );
-          midiInit = true;
-        }
-      }
-
-      if( global.interface.portsInUse.indexOf( server.webSocketPort ) === -1 ) {
-        server.webSocket  = new ws.Server({ port:server.webSocketPort });
-        global.interface.portsInUse.push( server.webSocketPort );
-      }else{
-        alert( 'there is already a service runnning on port ' + server.webSocketPort + '. please choose another socket port.' );
-        if( server.oscInput !== null ) { 
-          server.oscInput.close(); 
-          global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.oscInputPort ), 1 );
-        }
+        alert('there is already a service runnning on port ' + server.oscInputPort + '. please choose another port for osc input.');
         return;
-      }
+      }        
+  }else{
+    if( !midiInit ) {
+      midiOutput = new midi.output();
+      midiOutput.openVirtualPort( "Interface.Server Output" );
+      midiInit = true;
+    }
+  }
 
-      if(global.interface.portsInUse.indexOf( server.webServerPort ) === -1) {
-        if( server.livecode === true ) {
-          server.webServer = connect()
-          .use( server.serveInterfaceJS )
-          .use( function(req, res) { res.end( global.interface.livecodePage ) })
-          .listen( server.webServerPort );
-          server.name = 'livecode';
-        }else{
-          server.webServer = connect()
-          .use( connect.directory( server.directory, { hidden:true,icons:true } ) )
-          .use( server.serveInterfaceJS )
-          .use( connect.static( server.directory ) )
-          .listen( server.webServerPort,'0.0.0.0' );
-        }
-        global.interface.portsInUse.push( server.webServerPort );
-      }else{
-        alert( 'there is already a service runnning on port ' + server.webServerPort + '. please choose another web server port.' );
+  if( global.interface.portsInUse.indexOf( server.webSocketPort ) === -1 ) {
+    server.webSocket  = new ws.Server({ port:server.webSocketPort });
+    global.interface.portsInUse.push( server.webSocketPort );
+  }else{
+    alert( 'there is already a service runnning on port ' + server.webSocketPort + '. please choose another socket port.' );
+    if( server.oscInput !== null ) { 
+      server.oscInput.close(); 
+      global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.oscInputPort ), 1 );
+    }
+    return;
+  }
 
-        if( server.oscInput !== null ) { 
-          server.oscInput.close();
-          global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.oscInputPort ), 1 );
-        }
+  if(global.interface.portsInUse.indexOf( server.webServerPort ) === -1) {
+    if( server.livecode === true ) {
+      server.webServer = connect()
+      .use( server.serveInterfaceJS )
+      .use( function(req, res) { res.end( global.interface.livecodePage ) })
+      .listen( server.webServerPort );
+      server.name = 'livecode';
+    }else{
+      // console.log("Server Dir for connect: " + server.directory);
+       //console.log("InterfJS: " + server.serveInterfaceJS);
+      server.webServer = connect()
+      .use( connect.directory( server.directory, { hidden:true,icons:true } ) )
+      .use( server.serveInterfaceJS )
+      .use( connect.static( server.directory ) )
+      .listen( server.webServerPort,'0.0.0.0' );
+    }
+    global.interface.portsInUse.push( server.webServerPort );
+  }else{
+    alert( 'there is already a service runnning on port ' + server.webServerPort + '. please choose another web server port.' );
 
-        if( server.webSocket !== null ) {
-          global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.webSocketPort ), 1 );
-          server.webSocket.close();
-        }
-        return;
-      }
+    if( server.oscInput !== null ) { 
+      server.oscInput.close();
+      global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.oscInputPort ), 1 );
+    }
 
-      global.interface.createWebSocketListener( server );
-      
-      if(server.outputType === 'OSC') {
-        server.oscInput.on('', function(args) {
+    if( server.webSocket !== null ) {
+      global.interface.portsInUse.splice( global.interface.portsInUse.indexOf( server.webSocketPort ), 1 );
+      server.webSocket.close();
+    }
+    return;
+  }
+
+  global.interface.createWebSocketListener( server );
+
+  if(server.outputType === 'OSC') {
+    server.oscInput.on('', function(args) {
           // console.log( 'MSG RECEVIED ' + args.path + ' : CLIENTS COUNT ' + server.clients.length )
           var split = args.path.split("/");          
           if(split[1] === 'clients') {
@@ -723,7 +717,7 @@ handleMsgFromClients : function( server, address, args, socket) {
             msg.typetags = args.typetag;
             msg.parameters = args.params;
             msg.type = 'osc'
-            
+
             for(var key in server.clients) {
               var client = server.clients[key];
               if( client.id === clientNum ) {
@@ -739,9 +733,9 @@ handleMsgFromClients : function( server, address, args, socket) {
               // console.log( 'CLIENT ' + key ) 
               var client = server.clients[key];
               client.send( JSON.stringify({ type:'osc', address:args.path, typetags:args.typetag, parameters:args.params }) );
-            }
           }
-        });
+      }
+  });
   server.oscOutput.send( '/serverCreated', 's', [ server.name ] ); 
 }else if( server.outputType === 'WebSocket' ) {
   if( server.master !== null ) { 
@@ -778,51 +772,51 @@ masterSocketMsg : function( args ) {
               // console.log( "SENDING", clientNum )
               remote = this.server.clients[i];
               break;
-            }
           }
-
-          if(remote !== null) {
-            remote.send( JSON.stringify( msg ) );
-          }
-        }
-      }else{
-        for(var i = 0; i < this.server.clients.length; i++) {
-          this.server.clients[i].send( JSON.stringify(msg) );
-        }
       }
-    },
-    
-    connectMaster : function( master ) {
-      global.interface.livecodeServer.master = master
-      master.on( 'message', global.interface.masterSocketMsg )
-      console.log( "Master connected!!!" )
-    }
-  };
-  
-  global.interface.init();
-  
-  global.interface.interfaceJS = fs.readFileSync( './zepto.js', ['utf-8'] );
-  global.interface.interfaceJS += fs.readFileSync( './interface.js/interface.js', ['utf-8'] );
-  global.interface.interfaceJS += fs.readFileSync( './server/interface.client.js', ['utf-8'] );
-  global.interface.interfaceJS += fs.readFileSync( './server/autogui.js', ['utf-8'] );
-  
+
+      if(remote !== null) {
+        remote.send( JSON.stringify( msg ) );
+      }
+  }
+}else{
+  for(var i = 0; i < this.server.clients.length; i++) {
+    this.server.clients[i].send( JSON.stringify(msg) );
+  }
+}
+},
+
+connectMaster : function( master ) {
+  global.interface.livecodeServer.master = master
+  master.on( 'message', global.interface.masterSocketMsg )
+  console.log( "Master connected!!!" )
+}
+};
+
+//TODO: check for paths here
+global.interface.init();
+global.interface.interfaceJS = fs.readFileSync( pathModule.normalize('./zepto.js'), ['utf-8'] );
+global.interface.interfaceJS += fs.readFileSync( pathModule.normalize('./interface.js/interface.js'), ['utf-8'] );
+global.interface.interfaceJS += fs.readFileSync( pathModule.normalize('./server/interface.client.js'), ['utf-8'] );
+global.interface.interfaceJS += fs.readFileSync( pathModule.normalize('./server/autogui.js'), ['utf-8'] );
+
  // global.interface.livecodePage = fs.readFileSync( './server/interfaces/livecode.html', ['utf-8'] );
 
  var your_menu = new gui.Menu({ 
   type: 'menubar' 
-});
+ });
  var file = new gui.MenuItem({ label: 'File' });
  var submenu = new gui.Menu();
 
  submenu.append( new gui.MenuItem({ 
   label: 'Open Server Configuration ⌘O',
   click: global.interface.openFile,
-}));
+ }));
 
  submenu.append( new gui.MenuItem({ 
   label: 'Save Server Configuration   ⌘S',
   click: global.interface.saveFile,
-}) );
+ }) );
 
  submenu.append(new gui.MenuItem({
   type: 'normal',
@@ -833,7 +827,7 @@ masterSocketMsg : function( args ) {
   enabled: true,
   modifiers: 'cmd-Q',
   key: 'q'
-}));
+ }));
 
 
  file.submenu = submenu;
@@ -903,27 +897,38 @@ masterSocketMsg : function( args ) {
 //CODE ADDED by JGarcia for Trajectories Server
 ////////////////////////////////////////////////
 
-var default_interface_path = $(location).attr('pathname');
-var path = window.location.pathname;
+var app_dir = pathModule.normalize(process.cwd());
+//console.log("app dir path: " + app_dir);
 
-//go back to the .app file
-path = path.substr(0, path.lastIndexOf('WOB'));
-var save_directory = path + "traj";
+var index_path = pathModule.normalize(window.location.pathname);
+//console.log("Index path: " + index_path);
 
+//this is a trcik to get the root either when running on command line or from the app file.
+var root_path = pathModule.normalize(index_path.substr(0, index_path.lastIndexOf('Traj')));
+//console.log("Root path: " + root_path);
 
-if (!fs.existsSync(save_directory)){
-  fs.mkdirSync(save_directory);
+if(root_path =="."){
+  root_path = app_dir;
 }
 
+//Create the path to the traj directory for saving trajs
+var traj_path = pathModule.normalize(root_path + "/trajAsText");
+//console.log("Traj path: " + traj_path);
+
+//TODO: check for paths here
+//WARNING may have permissions problems! Considering asking the user for a directory
+if (!fs.existsSync(traj_path)){
+  fs.mkdirSync(traj_path);
+}
 
 function savetraj(args){
-  var session_dir = save_directory+"/"+args[0];
+  var session_dir = pathModule.normalize(traj_path+"/"+args[0]);
 
   if (!fs.existsSync(session_dir)){
     fs.mkdirSync(session_dir);
   }
 
-  var filename = session_dir+"/"+args[1]+".txt";
+  var filename = pathModule.normalize(session_dir+ pathModule.sep +args[1]+".txt");
 
   //make the content of the file
   var content = "";
@@ -941,7 +946,7 @@ function savetraj(args){
     if(ii === args.length - 4){
       content+= "\n";
     }else{
-       content+= ", \n";
+      content+= ", \n";
     }
     prevt = args[ii+3];
   }
@@ -960,17 +965,19 @@ function savetraj(args){
 
 }
 
-default_interface_path = default_interface_path.replace("index.html","server/interfaces");
-//add the default server
-var default_traj_server = {
+var server_path = pathModule.normalize(app_dir + "/server/interfaces");
+//console.log("Server Path: " + server_path);
+
+//create the server for Trajectoires
+var traj_server = {
   webSocketPort:  8081,
   oscInputPort: 8082,
   oscOutputPort: 8083,
   oscOutputIP:"127.0.0.1",
   webServerPort: 8080,
   outputType: 'OSC',
-  directory : default_interface_path,
-  savedirectory : save_directory,
+  directory : server_path,
+  savedirectory : traj_path,
   shouldAppendID: false,
   shouldMonitor : false,
   clients       : [],
@@ -978,34 +985,35 @@ var default_traj_server = {
   name          : "TrajectoiresServer",
 };
 
+//Add the server to the list and connect it
+var def_server = global.interface.serverRow(traj_server); 
 
-var def_server = global.interface.serverRow(default_traj_server); 
-  //global.interface.trajectoiresPage = fs.readFileSync( './server/interfaces/Trajectoires.html', ['utf-8'] );
-
-//OLD FUNCTIONS WITH IP ADDRESS INSTEAD OF COMPUTER'S NAME
-/*
-  var interfaces = os.networkInterfaces();
-  var addresses = [];
-  for (var k in interfaces) {
-    for (var k2 in interfaces[k]) {
-      var address = interfaces[k][k2];
-      if (address.family === 'IPv4' && !address.internal) {
-        addresses.push(address.address);
-      }
+//Get ip address and generate QR code to facilitate connection
+var interfaces = os.networkInterfaces();
+var addresses = [];
+for (var k in interfaces) {
+  for (var k2 in interfaces[k]) {
+    var address = interfaces[k][k2];
+    if (address.family === 'IPv4' && !address.internal) {
+      addresses.push(address.address);
     }
   }
-  var server_ip = addresses[0];
-  */
+}
+//use the first one as IP
+var server_ip = addresses[0];
+//console.log(addresses + " ");
+//to use computer name instead, not good after Yosemite version since these are reserved to Bonjour protocol.
+//var server_ip = os.hostname();
 
-  var server_ip = os.hostname();
-  var link = 'http://' + server_ip + ':8080/Trajectoires.html';
+//Build the link to the html file
+var link = 'http://' + server_ip + ':'+ traj_server.webServerPort+ '/Trajectoires.html';
 
 //URL DISPLAY
 var div_text = "<a href=\"" +link + "\" target=\"_blank\">"+ link +"</a>" ;
 var target_div = $('#target-url').html( div_text );
 
 //QR CODE
-var code = qr.image(link, { type: 'png' }); 
+var code = qr.image(link, { type: 'png' });
 var code_path = 'qr_code.png'; 
 var output = fs.createWriteStream(code_path);
 code.pipe(output);  
@@ -1017,7 +1025,6 @@ code.on('end', function() {
   elem.setAttribute("width", "205");
   document.getElementById("target-qrcode").appendChild(elem);
 });
-
 
 global.interface.oscAdminIn.on('', function(args) {
   if(args.path in __admin) {
@@ -1056,7 +1063,6 @@ Mousetrap.bind('command+escape', function() { win.isFullscreen = !win.isFullscre
 $(window).on('load', function() {
   win.moveTo(0,30);
   win.resizeTo(800, 650);
-    //win.blur();
-    win.show();
-  });
+  win.show();
+});
 }
