@@ -132,3 +132,6 @@ API
 Training
 Blog
 About
+
+.idea/*
+Traj/package-lock.json
