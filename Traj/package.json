@@ -23,8 +23,8 @@
     "ws": "0.7.1"
   },
   "devDependencies": {
-    "gulp": "^3.9.0",
+    "gulp": "^4.0.2",
     "gulp-util": "3.0.4",
-    "nw-builder": "^2.0.2"
+    "nw-builder": "^4.0.0-rc.8"
   }
 }
